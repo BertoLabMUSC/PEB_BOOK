@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Comparative genomics using R</title>
+  <meta name="description" content="Comparative genomics using R" />
+  <meta name="generator" content="bookdown 0.12 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Comparative genomics using R" />
+  <meta property="og:type" content="book" />
+  <meta property="og:url" content="https://github.com/StefanoBertoUTSW/PEB_BOOK" />
+  <meta property="og:image" content="https://github.com/StefanoBertoUTSW/PEB_BOOKimages/cover.jpg" />
+  <meta property="og:description" content="Comparative genomics using R" />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Comparative genomics using R" />
+  
+  <meta name="twitter:description" content="Comparative genomics using R" />
+  <meta name="twitter:image" content="https://github.com/StefanoBertoUTSW/PEB_BOOKimages/cover.jpg" />
+
+<meta name="author" content="Stefano Berto, PhD" />
+
+
+<meta name="date" content="2020-03-01" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+
+<link rel="next" href="introPipes.html">
+<script src="libs/jquery/jquery.min.js"></script>
+<link href="libs/gitbook/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+<script src="libs/htmlwidgets/htmlwidgets.js"></script>
+<link href="libs/datatables-css/datatables-crosstalk.css" rel="stylesheet" />
+<script src="libs/datatables-binding/datatables.js"></script>
+<link href="libs/dt-core/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="libs/dt-core/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="libs/dt-core/js/jquery.dataTables.min.js"></script>
+<link href="libs/crosstalk/css/crosstalk.css" rel="stylesheet" />
+<script src="libs/crosstalk/js/crosstalk.min.js"></script>
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">A Comparative Genomics</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Introduction</a><ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#what-will-you-get-out-of-this"><i class="fa fa-check"></i>What will you get out of this?</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#structure-of-the-course"><i class="fa fa-check"></i>Structure of the course</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#packages-needed-to-run-the-course-code"><i class="fa fa-check"></i>Packages needed to run the course code</a></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="introPipes.html"><a href="introPipes.html"><i class="fa fa-check"></i><b>1</b> Introduction to RNA-seq pipes</a><ul>
+<li class="chapter" data-level="1.1" data-path="introPipes.html"><a href="introPipes.html#sequencing-machines"><i class="fa fa-check"></i><b>1.1</b> Sequencing Machines</a></li>
+<li class="chapter" data-level="1.2" data-path="introPipes.html"><a href="introPipes.html#fastq"><i class="fa fa-check"></i><b>1.2</b> FASTQ</a></li>
+<li class="chapter" data-level="1.3" data-path="introPipes.html"><a href="introPipes.html#quality-check"><i class="fa fa-check"></i><b>1.3</b> Quality Check</a></li>
+<li class="chapter" data-level="1.4" data-path="introPipes.html"><a href="introPipes.html#quality-trimming"><i class="fa fa-check"></i><b>1.4</b> Quality Trimming</a></li>
+<li class="chapter" data-level="1.5" data-path="introPipes.html"><a href="introPipes.html#alignment"><i class="fa fa-check"></i><b>1.5</b> Alignment</a></li>
+<li class="chapter" data-level="1.6" data-path="introPipes.html"><a href="introPipes.html#statistics-and-filtering"><i class="fa fa-check"></i><b>1.6</b> Statistics and Filtering</a></li>
+<li class="chapter" data-level="1.7" data-path="introPipes.html"><a href="introPipes.html#lift-over"><i class="fa fa-check"></i><b>1.7</b> Lift over</a></li>
+<li class="chapter" data-level="1.8" data-path="introPipes.html"><a href="introPipes.html#quantification"><i class="fa fa-check"></i><b>1.8</b> Quantification</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="DataExploration.html"><a href="DataExploration.html"><i class="fa fa-check"></i><b>2</b> Data Exploration</a><ul>
+<li class="chapter" data-level="2.0.1" data-path="DataExploration.html"><a href="DataExploration.html#data-loading"><i class="fa fa-check"></i><b>2.0.1</b> Data loading</a></li>
+<li class="chapter" data-level="2.0.2" data-path="DataExploration.html"><a href="DataExploration.html#demographic-screening"><i class="fa fa-check"></i><b>2.0.2</b> Demographic screening</a></li>
+<li class="chapter" data-level="2.0.3" data-path="DataExploration.html"><a href="DataExploration.html#data-normalization"><i class="fa fa-check"></i><b>2.0.3</b> Data normalization</a></li>
+<li class="chapter" data-level="2.0.4" data-path="DataExploration.html"><a href="DataExploration.html#initial-data-exploration"><i class="fa fa-check"></i><b>2.0.4</b> Initial Data Exploration</a></li>
+<li class="chapter" data-level="2.0.5" data-path="DataExploration.html"><a href="DataExploration.html#variance-explained-by-covariates"><i class="fa fa-check"></i><b>2.0.5</b> Variance explained by covariates</a></li>
+<li class="chapter" data-level="2.0.6" data-path="DataExploration.html"><a href="DataExploration.html#save-the-data"><i class="fa fa-check"></i><b>2.0.6</b> Save the data</a></li>
+<li class="chapter" data-level="2.0.7" data-path="DataExploration.html"><a href="DataExploration.html#exercise-for-data-exploration-chapter"><i class="fa fa-check"></i><b>2.0.7</b> Exercise for Data Exploration chapter</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="DiffExpAnalysis.html"><a href="DiffExpAnalysis.html"><i class="fa fa-check"></i><b>3</b> Differential Expression Analysis</a><ul>
+<li class="chapter" data-level="3.1" data-path="DiffExpAnalysis.html"><a href="DiffExpAnalysis.html#data-loading-1"><i class="fa fa-check"></i><b>3.1</b> Data loading</a></li>
+<li class="chapter" data-level="3.2" data-path="DiffExpAnalysis.html"><a href="DiffExpAnalysis.html#dge-based-on-linear-model"><i class="fa fa-check"></i><b>3.2</b> DGE based on linear model</a></li>
+<li class="chapter" data-level="3.3" data-path="DiffExpAnalysis.html"><a href="DiffExpAnalysis.html#species-specific-dge"><i class="fa fa-check"></i><b>3.3</b> Species Specific DGE</a></li>
+<li class="chapter" data-level="3.4" data-path="DiffExpAnalysis.html"><a href="DiffExpAnalysis.html#surrogate-variables"><i class="fa fa-check"></i><b>3.4</b> Surrogate Variables</a></li>
+<li class="chapter" data-level="3.5" data-path="DiffExpAnalysis.html"><a href="DiffExpAnalysis.html#balance-the-gene-expression-for-covariates"><i class="fa fa-check"></i><b>3.5</b> Balance the gene expression for covariates</a></li>
+<li class="chapter" data-level="3.6" data-path="DiffExpAnalysis.html"><a href="DiffExpAnalysis.html#dge-visualizations"><i class="fa fa-check"></i><b>3.6</b> DGE visualizations</a></li>
+<li class="chapter" data-level="3.7" data-path="DiffExpAnalysis.html"><a href="DiffExpAnalysis.html#functional-enrichment"><i class="fa fa-check"></i><b>3.7</b> Functional Enrichment</a></li>
+<li class="chapter" data-level="3.8" data-path="DiffExpAnalysis.html"><a href="DiffExpAnalysis.html#dge-based-on-deseq2"><i class="fa fa-check"></i><b>3.8</b> DGE based on DESeq2</a></li>
+<li class="chapter" data-level="3.9" data-path="DiffExpAnalysis.html"><a href="DiffExpAnalysis.html#exercise-for-differential-expression-chapter"><i class="fa fa-check"></i><b>3.9</b> Exercise for Differential Expression Chapter</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Comparative genomics using R</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="header">
+<h1 class="title">Comparative genomics using R</h1>
+<p class="author"><em>Stefano Berto, PhD</em></p>
+<p class="date"><em>2020-03-01</em></p>
+</div>
+<div id="introduction" class="section level1 unnumbered">
+<h1>Introduction</h1>
+<p><a href="" target="_blank"><img src="images/cover.jpg" width="300px" style="display: block; margin: auto;" /></a></p>
+<p>The aim of this course is to provide the fundamentals for data analysis for comparative genomics. This course is a starting point for computational genomics students interested on comparative genomics and a guide for further data analysis in more specific topics in genomics.</p>
+<div id="what-will-you-get-out-of-this" class="section level2 unnumbered">
+<h2>What will you get out of this?</h2>
+<p>This resource describes the skills and provides how-tos that will help readers
+analyze their own comparative genomic data.</p>
+<p>Working together:</p>
+<ul>
+<li><p>You will get exposed to current tools for transcriptomics.</p></li>
+<li><p>You will advance with the basics of R and dive right in to specialized uses of R for comparative genomics.</p></li>
+<li><p>You will apply simple data processing and analysis approached on the data</p></li>
+<li><p>You will be able to use R and the library-verse to do some visualizations and in deep analysis.</p></li>
+<li><p>You will (hopefully :-)) develop a critical mindset on data analysis, gaps, weakness and how to solve some problems.</p></li>
+<li><p>You will develop ideas, questions, hypothesis to how solve the big puzzle called brain</p></li>
+</ul>
+</div>
+<div id="structure-of-the-course" class="section level2 unnumbered">
+<h2>Structure of the course</h2>
+<p>The course is designed with insights into practical data analysis for comparative genomics. The course will focus on methods, data visualizations, and some biostats that can be applied not only to comparative data but also to more diverse data. The course will always show the code and explain the code for a particular data analysis task.
+In addition, the course will provide also links and additional information such as websites, papers, websites for readers who desire to gain a bit more knowledge on the comparative genomics.</p>
+<p>Here the chapters with some exercises:</p>
+<ul>
+<li><strong>“Introduction to RNA-seq pipes” chapter</strong></li>
+</ul>
+<p>Basic concepts of high-throughput sequencing pipelines, tools, and how to apply these to comparative genomics. This will go through just from step A (fastq.gz) to step Z (count table). Importantly, how-tos for quality checks, processing, alignments of high-throughput sequencing.</p>
+<ul>
+<li><strong>“Data Exploration” chapter</strong></li>
+</ul>
+<p>It provides basic R skills to explore, analyze, visualize data. The skills introduced in this chapter are important because cna be applied, with some modifications, to other type of data.</p>
+<ul>
+<li><strong>“Differential Expression” chapter</strong></li>
+</ul>
+<p>It provides basic R skills to explore, analyze, visualize differential expression between species.</p>
+</div>
+<div id="packages-needed-to-run-the-course-code" class="section level2 unnumbered">
+<h2>Packages needed to run the course code</h2>
+<p>This course is primarily about using R packages. Therefore if you want to reproduce the analysis in this course you need to install the relevant packages in each chapter using <code>install.packages</code> or <code>BiocManager::install</code> functions.</p>
+<p>So here we go!!</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="cf">if</span> (<span class="op">!</span><span class="kw">requireNamespace</span>(<span class="st">&quot;BiocManager&quot;</span>, <span class="dt">quietly =</span> <span class="ot">TRUE</span>))</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2">    <span class="kw">install.packages</span>(<span class="st">&quot;BiocManager&quot;</span>)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3">BiocManager<span class="op">::</span><span class="kw">install</span>(<span class="kw">c</span>(<span class="st">&#39;qvalue&#39;</span>,<span class="st">&#39;clusterProfiler&#39;</span>,<span class="st">&#39;DESeq2&#39;</span>,</a>
+<a class="sourceLine" id="cb1-4" data-line-number="4">                       <span class="st">&#39;limma&#39;</span>,<span class="st">&#39;sva&#39;</span>,<span class="st">&#39;edgeR&#39;</span>,<span class="st">&#39;doParallel&#39;</span>,</a>
+<a class="sourceLine" id="cb1-5" data-line-number="5">                       <span class="st">&#39;EnsDb.Hsapiens.v86&#39;</span>,<span class="st">&#39;AnnotationDbi&#39;</span>,</a>
+<a class="sourceLine" id="cb1-6" data-line-number="6">                       <span class="st">&#39;GOstats&#39;</span>)</a>
+<a class="sourceLine" id="cb1-7" data-line-number="7">                     </a>
+<a class="sourceLine" id="cb1-8" data-line-number="8"><span class="kw">install.packages</span>(<span class="st">&quot;future.apply&quot;</span>)</a>
+<a class="sourceLine" id="cb1-9" data-line-number="9"><span class="kw">install.packages</span>(<span class="st">&quot;biomaRt&quot;</span>)</a>
+<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="kw">install.packages</span>(<span class="st">&quot;tidymodels&quot;</span>)</a>
+<a class="sourceLine" id="cb1-11" data-line-number="11"><span class="kw">install.packages</span>(<span class="st">&quot;broom&quot;</span>)</a>
+<a class="sourceLine" id="cb1-12" data-line-number="12"><span class="kw">install.packages</span>(<span class="st">&quot;here&quot;</span>)</a>
+<a class="sourceLine" id="cb1-13" data-line-number="13"><span class="kw">install.packages</span>(<span class="st">&quot;pheatmap&quot;</span>)</a>
+<a class="sourceLine" id="cb1-14" data-line-number="14"><span class="kw">install.packages</span>(<span class="st">&quot;VennDiagram&quot;</span>)</a>
+<a class="sourceLine" id="cb1-15" data-line-number="15"><span class="kw">install.packages</span>(<span class="st">&quot;GGally&quot;</span>)</a>
+<a class="sourceLine" id="cb1-16" data-line-number="16"></a>
+<a class="sourceLine" id="cb1-17" data-line-number="17"><span class="kw">install.packages</span>(<span class="st">&quot;devtools&quot;</span>)</a>
+<a class="sourceLine" id="cb1-18" data-line-number="18">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;kassambara/ggpubr&quot;</span>)</a>
+<a class="sourceLine" id="cb1-19" data-line-number="19">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;tidyverse/tidyverse&quot;</span>)</a>
+<a class="sourceLine" id="cb1-20" data-line-number="20">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;ycphs/openxlsx&quot;</span>)</a>
+<a class="sourceLine" id="cb1-21" data-line-number="21">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;tidyverse/ggplot2&quot;</span>)</a>
+<a class="sourceLine" id="cb1-22" data-line-number="22">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;hms-dbmi/UpSetR&quot;</span>)</a></code></pre></div>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+
+<a href="introPipes.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook/js/app.min.js"></script>
+<script src="libs/gitbook/js/lunr.js"></script>
+<script src="libs/gitbook/js/plugin-search.js"></script>
+<script src="libs/gitbook/js/plugin-sharing.js"></script>
+<script src="libs/gitbook/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/rstudio/bookdown-demo/edit/master/index.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"download": ["bookdown-demo.pdf", "bookdown-demo.epub"],
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>

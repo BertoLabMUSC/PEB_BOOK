@@ -1,0 +1,2125 @@
+\documentclass[]{book}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage{hyperref}
+\PassOptionsToPackage{usenames,dvipsnames}{color} % color is loaded by hyperref
+\hypersetup{unicode=true,
+            pdftitle={Comparative genomics using R},
+            pdfauthor={Stefano Berto, PhD},
+            colorlinks=true,
+            linkcolor=Maroon,
+            citecolor=Blue,
+            urlcolor=Blue,
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{natbib}
+\bibliographystyle{apalike}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\providecommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{Comparative genomics using R}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Stefano Berto, PhD}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{2020-03-01}
+
+\usepackage{booktabs}
+\usepackage{amsthm}
+\makeatletter
+\def\thm@space@setup{%
+  \thm@preskip=8pt plus 2pt minus 4pt
+  \thm@postskip=\thm@preskip
+}
+\makeatother
+
+\begin{document}
+\maketitle
+
+{
+\hypersetup{linkcolor=black}
+\setcounter{tocdepth}{1}
+\tableofcontents
+}
+\hypertarget{introduction}{%
+\chapter*{Introduction}\label{introduction}}
+\addcontentsline{toc}{chapter}{Introduction}
+
+The aim of this course is to provide the fundamentals for data analysis for comparative genomics. This course is a starting point for computational genomics students interested on comparative genomics and a guide for further data analysis in more specific topics in genomics.
+
+\hypertarget{what-will-you-get-out-of-this}{%
+\section*{What will you get out of this?}\label{what-will-you-get-out-of-this}}
+\addcontentsline{toc}{section}{What will you get out of this?}
+
+This resource describes the skills and provides how-tos that will help readers
+analyze their own comparative genomic data.
+
+Working together:
+
+\begin{itemize}
+\item
+  You will get exposed to current tools for transcriptomics.
+\item
+  You will advance with the basics of R and dive right in to specialized uses of R for comparative genomics.
+\item
+  You will apply simple data processing and analysis approached on the data
+\item
+  You will be able to use R and the library-verse to do some visualizations and in deep analysis.
+\item
+  You will (hopefully :-)) develop a critical mindset on data analysis, gaps, weakness and how to solve some problems.
+\item
+  You will develop ideas, questions, hypothesis to how solve the big puzzle called brain
+\end{itemize}
+
+\hypertarget{structure-of-the-course}{%
+\section*{Structure of the course}\label{structure-of-the-course}}
+\addcontentsline{toc}{section}{Structure of the course}
+
+The course is designed with insights into practical data analysis for comparative genomics. The course will focus on methods, data visualizations, and some biostats that can be applied not only to comparative data but also to more diverse data. The course will always show the code and explain the code for a particular data analysis task.
+In addition, the course will provide also links and additional information such as websites, papers, websites for readers who desire to gain a bit more knowledge on the comparative genomics.
+
+Here the chapters with some exercises:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{``Introduction to RNA-seq pipes'' chapter}
+\end{itemize}
+
+Basic concepts of high-throughput sequencing pipelines, tools, and how to apply these to comparative genomics. This will go through just from step A (fastq.gz) to step Z (count table). Importantly, how-tos for quality checks, processing, alignments of high-throughput sequencing.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{``Data Exploration'' chapter}
+\end{itemize}
+
+It provides basic R skills to explore, analyze, visualize data. The skills introduced in this chapter are important because cna be applied, with some modifications, to other type of data.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{``Differential Expression'' chapter}
+\end{itemize}
+
+It provides basic R skills to explore, analyze, visualize differential expression between species.
+
+\hypertarget{packages-needed-to-run-the-course-code}{%
+\section*{Packages needed to run the course code}\label{packages-needed-to-run-the-course-code}}
+\addcontentsline{toc}{section}{Packages needed to run the course code}
+
+This course is primarily about using R packages. Therefore if you want to reproduce the analysis in this course you need to install the relevant packages in each chapter using \texttt{install.packages} or \texttt{BiocManager::install} functions.
+
+So here we go!!
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{if}\NormalTok{ (}\OperatorTok{!}\KeywordTok{requireNamespace}\NormalTok{(}\StringTok{"BiocManager"}\NormalTok{, }\DataTypeTok{quietly =} \OtherTok{TRUE}\NormalTok{))}
+    \KeywordTok{install.packages}\NormalTok{(}\StringTok{"BiocManager"}\NormalTok{)}
+\NormalTok{BiocManager}\OperatorTok{::}\KeywordTok{install}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{'qvalue'}\NormalTok{,}\StringTok{'clusterProfiler'}\NormalTok{,}\StringTok{'DESeq2'}\NormalTok{,}
+                       \StringTok{'limma'}\NormalTok{,}\StringTok{'sva'}\NormalTok{,}\StringTok{'edgeR'}\NormalTok{,}\StringTok{'doParallel'}\NormalTok{,}
+                       \StringTok{'EnsDb.Hsapiens.v86'}\NormalTok{,}\StringTok{'AnnotationDbi'}\NormalTok{,}
+                       \StringTok{'GOstats'}\NormalTok{)}
+                     
+\KeywordTok{install.packages}\NormalTok{(}\StringTok{"future.apply"}\NormalTok{)}
+\KeywordTok{install.packages}\NormalTok{(}\StringTok{"biomaRt"}\NormalTok{)}
+\KeywordTok{install.packages}\NormalTok{(}\StringTok{"tidymodels"}\NormalTok{)}
+\KeywordTok{install.packages}\NormalTok{(}\StringTok{"broom"}\NormalTok{)}
+\KeywordTok{install.packages}\NormalTok{(}\StringTok{"here"}\NormalTok{)}
+\KeywordTok{install.packages}\NormalTok{(}\StringTok{"pheatmap"}\NormalTok{)}
+\KeywordTok{install.packages}\NormalTok{(}\StringTok{"VennDiagram"}\NormalTok{)}
+\KeywordTok{install.packages}\NormalTok{(}\StringTok{"GGally"}\NormalTok{)}
+
+\KeywordTok{install.packages}\NormalTok{(}\StringTok{"devtools"}\NormalTok{)}
+\NormalTok{devtools}\OperatorTok{::}\KeywordTok{install_github}\NormalTok{(}\StringTok{"kassambara/ggpubr"}\NormalTok{)}
+\NormalTok{devtools}\OperatorTok{::}\KeywordTok{install_github}\NormalTok{(}\StringTok{"tidyverse/tidyverse"}\NormalTok{)}
+\NormalTok{devtools}\OperatorTok{::}\KeywordTok{install_github}\NormalTok{(}\StringTok{"ycphs/openxlsx"}\NormalTok{)}
+\NormalTok{devtools}\OperatorTok{::}\KeywordTok{install_github}\NormalTok{(}\StringTok{"tidyverse/ggplot2"}\NormalTok{)}
+\NormalTok{devtools}\OperatorTok{::}\KeywordTok{install_github}\NormalTok{(}\StringTok{"hms-dbmi/UpSetR"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{introPipes}{%
+\chapter{Introduction to RNA-seq pipes}\label{introPipes}}
+
+\hypertarget{sequencing-machines}{%
+\section{Sequencing Machines}\label{sequencing-machines}}
+
+Sequencing machines vary based on number of reads they sequence and running costs. Nowadays, the most used are NovaSeq and NextSeq 500, both illumina.
+
+\hypertarget{fastq}{%
+\section{FASTQ}\label{fastq}}
+
+This is the files sequencing facilities usually provide. This output is the same for multiple data, from RNA-seq to ChIP-seq, ATAC-seq, and so on. The FASTQ file is a modified version of a FASTA file with some additional information.
+
+\hypertarget{quality-check}{%
+\section{Quality Check}\label{quality-check}}
+
+This is a step to understand the quality of the million of reads the FASTQ contains.
+It can be done using fastqc (\url{https://www.bioinformatics.babraham.ac.uk/projects/fastqc/}) or in R with \texttt{library(fastqcr)} or \texttt{library(Rqc)}
+
+Here a simple R example:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{BiocManager}\OperatorTok{::}\KeywordTok{install}\NormalTok{(}\StringTok{"Rqc"}\NormalTok{)}
+\KeywordTok{library}\NormalTok{(Rqc)}
+\CommentTok{# load the fastq.gz files in your specific directory}
+\NormalTok{quality_checks <-}\StringTok{ }\KeywordTok{rqc}\NormalTok{(}\DataTypeTok{path =} \StringTok{"path_to_your_directory"}\NormalTok{, }\DataTypeTok{pattern =} \StringTok{".fastq.gz"}\NormalTok{, }
+  \DataTypeTok{openBrowser =} \OtherTok{FALSE}\NormalTok{)}
+
+\KeywordTok{rqcCycleQualityBoxPlot}\NormalTok{(quality_checks)}
+\KeywordTok{rqcCycleBaseCallsLinePlot}\NormalTok{(quality_checks)}
+\end{Highlighting}
+\end{Shaded}
+
+This will output similar plots and data quality check as fastqc.
+
+\hypertarget{quality-trimming}{%
+\section{Quality Trimming}\label{quality-trimming}}
+
+After checking the quality you can decide to trim the reads or not.
+Quality trimming is necessary to remove potential portion of the reads and/or base pairs with low quality. Low quality bases or fragments can affect mappability to the genome.
+Trimming can be done using trimmomatic (\url{http://www.usadellab.org/cms/?page=trimmomatic}), fastx (\url{http://hannonlab.cshl.edu/fastx_toolkit/}), or Trim Galore (\url{https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/}).
+
+\hypertarget{alignment}{%
+\section{Alignment}\label{alignment}}
+
+After quality check and trimming, the reads can be aligned to the reference genome. The process map the reads into the genome using a specific set of coordinates for genes. Alignment algorithms tolerate mismatches between reads and genome increasing overall mappability quality. Reads can be multimapped (map to multiple places on the genome) or with overall low quality. Alignment algorithms provide a quality score (MAPQ) for each reads and this can be easily used for filtering bad reads and retain only reads with high quality score which is often linked to uniquely mapped reads.
+
+There are different aligner for different type of NGS data.
+
+Here some example for ChIP-seq/ATAC-seq:
+
+\begin{itemize}
+\item
+  BWA (\url{http://bio-bwa.sourceforge.net/})
+\item
+  Bowtie2 (\url{http://bowtie-bio.sourceforge.net/bowtie2/index.shtml})
+\end{itemize}
+
+For RNA-seq data instead there are splice aware aligners. They require a gene annotation usually stored in a gtf file. GTF can be found in UCSC/Ensembl for different species. For model species such as human and mouse you can also find them in Genecode (\url{https://www.gencodegenes.org/}). These aligners can splice the reads that belongs to different portions of the genomes (e.g.~two different exons separated by an intron):
+
+\begin{itemize}
+\item
+  STAR (\url{https://github.com/alexdobin/STAR})
+\item
+  HISAT (\url{https://ccb.jhu.edu/software/hisat2/index.shtml})
+\end{itemize}
+
+First you will need to create a genome index.
+Here an example for STAR:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{STAR }\OperatorTok{--}\NormalTok{runMode genomeGenerate \textbackslash{}}
+\OperatorTok{--}\NormalTok{genomeDir Human_Genome_Directory}\OperatorTok{/}\StringTok{ }\NormalTok{\textbackslash{}}
+\OperatorTok{--}\NormalTok{genomeFastaFiles Human_Genome_Directory}\OperatorTok{/}\ErrorTok{*}\NormalTok{.fa \textbackslash{}}
+\OperatorTok{--}\NormalTok{runThreadN }\DecValTok{13}\NormalTok{ \textbackslash{}}
+\OperatorTok{--}\NormalTok{sjdbGTFfile gene_annotation.gtf \textbackslash{}}
+\OperatorTok{--}\NormalTok{sjdbOverhang }\DecValTok{75}
+\end{Highlighting}
+\end{Shaded}
+
+Then you can start the alignment
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{for}\NormalTok{ file }\ControlFlowTok{in} \StringTok{`}\DataTypeTok{ls *.Trim.fastq.gz}\StringTok{`}
+\NormalTok{do}
+\NormalTok{outputname=}\StringTok{`}\DataTypeTok{basename $file | sed -e "s/.Trim.fastq.gz//"}\StringTok{`}
+\NormalTok{STAR }\OperatorTok{--}\NormalTok{runThreadN }\DecValTok{14}\NormalTok{ \textbackslash{}}
+\OperatorTok{--}\NormalTok{genomeDir Human_Genome_Directory}\OperatorTok{/}\StringTok{ }\NormalTok{\textbackslash{}}
+\OperatorTok{--}\NormalTok{readFilesIn }\OperatorTok{$}\NormalTok{file \textbackslash{}}
+\OperatorTok{--}\NormalTok{readFilesCommand zcat \textbackslash{}}
+\OperatorTok{--}\NormalTok{sjdbGTFfile Human_Genome_Directory}\OperatorTok{/}\NormalTok{gene_annotation.gtf \textbackslash{}}
+\OperatorTok{--}\NormalTok{outFilterType BySJout  \textbackslash{}}
+\OperatorTok{--}\NormalTok{outFilterMismatchNoverReadLmax }\FloatTok{0.04}\NormalTok{ \textbackslash{}}
+\OperatorTok{--}\NormalTok{outFilterMultimapNmax }\DecValTok{10}\NormalTok{ \textbackslash{}}
+\OperatorTok{--}\NormalTok{alignSJoverhangMin }\DecValTok{10}\NormalTok{ \textbackslash{}}
+\OperatorTok{--}\NormalTok{alignSJDBoverhangMin }\DecValTok{1}\NormalTok{ \textbackslash{}}
+\OperatorTok{--}\NormalTok{outSAMtype BAM SortedByCoordinate \textbackslash{}}
+\OperatorTok{--}\NormalTok{outSAMunmapped Within \textbackslash{}}
+\OperatorTok{--}\NormalTok{outFilterMismatchNmax }\DecValTok{3}\NormalTok{ \textbackslash{}}
+\OperatorTok{--}\NormalTok{twopassMode Basic \textbackslash{}}
+\OperatorTok{--}\NormalTok{outFileNamePrefix }\OperatorTok{$}\NormalTok{outputname \textbackslash{}}
+\OperatorTok{--}\NormalTok{chimSegmentMin }\DecValTok{15}\NormalTok{ \textbackslash{}}
+\OperatorTok{--}\NormalTok{chimScoreMin }\DecValTok{15}\NormalTok{ \textbackslash{}}
+\OperatorTok{--}\NormalTok{chimScoreSeparation }\DecValTok{10}\NormalTok{ \textbackslash{}}
+\OperatorTok{--}\NormalTok{chimJunctionOverhangMin }\DecValTok{15}\NormalTok{ \textbackslash{}}
+\OperatorTok{--}\NormalTok{quantMode TranscriptomeSAM}
+\NormalTok{echo }\OperatorTok{$}\NormalTok{outputname}
+\NormalTok{done}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{statistics-and-filtering}{%
+\section{Statistics and Filtering}\label{statistics-and-filtering}}
+
+Alignment will provide a SAM/BAM file that can be easily handle with samtools (\url{https://github.com/samtools/}). This format contains all the reads and the statistics from the alignment (mapped, unmapped, MAPQ, \ldots{}) with specific FLAG id. Ideally you want to work with uniquely mapped reads (e.g.~reads that mapped into a single region). Some aligners can provide directly a bam file with only uniquely mapped reads. On the other hand, some aligner does not provide a flag for uniquely mapped (NH:i:1). Therefore you need to use MAPQ and filter for a specific threshold. As I descibed above, MAPQ is a -log10(P-value). Therefore, we can apply a threshold for such quality score.
+
+Here an example:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ls }\OperatorTok{*}\NormalTok{.bam }\OperatorTok{|}\StringTok{ }\NormalTok{parallel }\OperatorTok{--}\NormalTok{progress }\OperatorTok{--}\NormalTok{eta }\OperatorTok{-}\NormalTok{j }\DecValTok{15} \StringTok{'samtools view -bq 10 \{\} > \{.\}_mapQ10.bam'}
+\end{Highlighting}
+\end{Shaded}
+
+Here the example for fetching uniquely mapped reads (from STAR):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{for}\NormalTok{ file }\ControlFlowTok{in} \StringTok{`}\DataTypeTok{ls *.ex.bam}\StringTok{`}
+\NormalTok{do}
+\NormalTok{  outputname=}\StringTok{`}\DataTypeTok{basename $file | sed -e "s/.bam/.unique.bam/"}\StringTok{`}
+\NormalTok{    (samtools view }\OperatorTok{-}\NormalTok{H }\OperatorTok{$}\NormalTok{file; samtools view }\OperatorTok{-}\NormalTok{F }\DecValTok{2308} \OperatorTok{$}\NormalTok{file }\OperatorTok{|}\StringTok{ }\NormalTok{grep }\OperatorTok{-}\NormalTok{w }\StringTok{'NH:i:1'}\NormalTok{) }\OperatorTok{|}\StringTok{ }\NormalTok{\textbackslash{}}
+\NormalTok{    samtools view }\OperatorTok{-}\NormalTok{bS }\OperatorTok{-}\StringTok{ }\ErrorTok{>}\StringTok{ "$outputname"}
+\NormalTok{  echo }\OperatorTok{$}\NormalTok{file}
+\NormalTok{  echo }\OperatorTok{$}\NormalTok{outputname}
+\NormalTok{done}
+\end{Highlighting}
+\end{Shaded}
+
+Before and after filtering you can collect alignment statistics on the BAM file. This step can help with data handling and see whether there are biases on the sequencing you are analyzing.
+One of the most used tool is picard (\url{https://broadinstitute.github.io/picard/}). Picard can be wrapped using picardmetrics (\url{https://github.com/slowkow/picardmetrics}), a tool that will collect directly multiple statictis.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{find . }\OperatorTok{-}\NormalTok{name }\StringTok{"*.bam"} \OperatorTok{|}\StringTok{ }\NormalTok{\textbackslash{}}
+\NormalTok{  xargs }\OperatorTok{-}\NormalTok{n }\DecValTok{1} \OperatorTok{-}\NormalTok{P }\DecValTok{12} \OperatorTok{-}\NormalTok{iFILES sh }\OperatorTok{-}\NormalTok{c }\StringTok{'picardmetrics run -k -r -o PICARDMETRICS_OUT/ FILES;'}\NormalTok{; }
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{lift-over}{%
+\section{Lift over}\label{lift-over}}
+
+When analyzing different species you need a good quality gene annotation for the downstream quantification. Unfortunately, the best annotations are always based on model species as \textbf{Human} and \textbf{Mouse}.
+
+Therefore, it is necessary to translate coordinates of non-model species into model species for a better annotation. You can use these translated files with the primary annotation for the model species (in this case Human).
+
+There are tools that can help you with that: \textbf{liftOver} (\url{https://genome.ucsc.edu/cgi-bin/hgLiftOver}) and \textbf{CrossMap} (\url{http://crossmap.sourceforge.net/})
+
+These methods are based on cross-species annotations that you can easily find at the \textbf{UCSC Genome Brower} website (e.g.~\url{https://hgdownload.soe.ucsc.edu/goldenPath/hg38/liftOver/}).
+
+Here an example for CrossMap:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Lifting a chimpanzee bam to human coordinates}
+\NormalTok{python CrossMap.py bam panTro4ToHg38.over.chain.gz Chimp_Input.bam Chimp_Output}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{quantification}{%
+\section{Quantification}\label{quantification}}
+
+BAM files contain reads mapped to the genome with specific genomic coordinates (e.g.~chromosome, start, end, strand). These information are used for the quantification per gene counting the reads that overlap with the genomic location of a specific gene. Nevertheless there are some issue the quantifications tool are aware of (e.g.~different genes found in overlapping genomic locations but opposite strand). These confounding factors are taken into account during quantifications.
+
+There are several typo of quantification methods.
+
+Alignment free (or pseudoalignment):
+
+\begin{itemize}
+\item
+  Salmon (\url{https://salmon.readthedocs.io/en/latest/salmon.html})
+\item
+  Kallisto (\url{https://pachterlab.github.io/kallisto/})
+\item
+  Sailfish (\url{https://www.cs.cmu.edu/~ckingsf/software/sailfish/})
+\end{itemize}
+
+Alignment based (they need a GTF and aligned reads):
+
+\begin{itemize}
+\item
+  HTSeq-Count (\url{https://htseq.readthedocs.io/en/release_0.11.1/index.html})
+\item
+  featureCounts (\url{http://bioinf.wehi.edu.au/featureCounts/})
+\item
+  RSEM (\url{https://github.com/deweylab/RSEM})
+\end{itemize}
+
+Here one example for HTSeq:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{parallel }\OperatorTok{-}\NormalTok{j }\DecValTok{14} \StringTok{'samtools view \{\} | htseq-count -m intersection-strict \textbackslash{}}
+\StringTok{-t exon \textbackslash{}}
+\StringTok{-i gene_name \textbackslash{}}
+\StringTok{-s reverse \textbackslash{}}
+\StringTok{- Human_Genome_Directory/gene_annotation.gtf > \{.\}.txt'} \OperatorTok{:::}\StringTok{ }\ErrorTok{*}\NormalTok{.unique.bam}
+\end{Highlighting}
+\end{Shaded}
+
+The result of the quantification is a value per each gene per each sample. This is the raw count that determine how much this gene is expressed.
+
+\hypertarget{DataExploration}{%
+\chapter{Data Exploration}\label{DataExploration}}
+
+The starting data consist in RNA-seq count matrix after quantification (exp), a demographic table (demo) and a gene length table (width). The count table is a integer matrix without any normalizations. Each rows correspond to a gene, each column represent a different sample from three species (human, chimpanzee and rhesus macaque). The genes are protein-coding and orthologous between the three species.
+
+\hypertarget{data-loading}{%
+\subsection{Data loading}\label{data-loading}}
+
+\textbf{So let's start!}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# First load the libraries we will use in this section}
+\KeywordTok{suppressPackageStartupMessages}\NormalTok{(}\KeywordTok{library}\NormalTok{(sva))}
+\KeywordTok{suppressPackageStartupMessages}\NormalTok{(}\KeywordTok{library}\NormalTok{(DESeq2))}
+\KeywordTok{suppressPackageStartupMessages}\NormalTok{(}\KeywordTok{library}\NormalTok{(limma))}
+\KeywordTok{suppressPackageStartupMessages}\NormalTok{(}\KeywordTok{library}\NormalTok{(tidyverse))}
+\KeywordTok{suppressPackageStartupMessages}\NormalTok{(}\KeywordTok{library}\NormalTok{(openxlsx))}
+\KeywordTok{suppressPackageStartupMessages}\NormalTok{(}\KeywordTok{library}\NormalTok{(ggplot2))}
+\KeywordTok{suppressPackageStartupMessages}\NormalTok{(}\KeywordTok{library}\NormalTok{(ggpubr))}
+\KeywordTok{suppressPackageStartupMessages}\NormalTok{(}\KeywordTok{library}\NormalTok{(pheatmap))}
+\KeywordTok{suppressPackageStartupMessages}\NormalTok{(}\KeywordTok{library}\NormalTok{(here))}
+\KeywordTok{suppressPackageStartupMessages}\NormalTok{(}\KeywordTok{library}\NormalTok{(future.apply))}
+\KeywordTok{suppressPackageStartupMessages}\NormalTok{(}\KeywordTok{library}\NormalTok{(broom))}
+
+\CommentTok{# Clean the env}
+\KeywordTok{rm}\NormalTok{(}\DataTypeTok{list =} \KeywordTok{ls}\NormalTok{())}
+
+\CommentTok{# the data is stored under the subdirectory 'data'}
+\KeywordTok{list.files}\NormalTok{()}
+\CommentTok{##  [1] "_book"                  "_bookdown_files"       }
+\CommentTok{##  [3] "_bookdown.yml"          "_build.sh"             }
+\CommentTok{##  [5] "_deploy.sh"             "_output.yml"           }
+\CommentTok{##  [7] "01-introPipes.Rmd"      "02-DataExploration.Rmd"}
+\CommentTok{##  [9] "03-DiffExpAnalysis.Rmd" "addson"                }
+\CommentTok{## [11] "book.bib"               "bookdown-demo_cache"   }
+\CommentTok{## [13] "bookdown-demo_files"    "bookdown-demo.Rmd"     }
+\CommentTok{## [15] "bookdown-demo.Rproj"    "DESCRIPTION"           }
+\CommentTok{## [17] "Dockerfile"             "images"                }
+\CommentTok{## [19] "index.Rmd"              "LICENSE"               }
+\CommentTok{## [21] "now.json"               "packages.bib"          }
+\CommentTok{## [23] "peb_data"               "preamble.tex"          }
+\CommentTok{## [25] "README.md"              "style.css"             }
+\CommentTok{## [27] "toc.css"}
+
+\CommentTok{# load the data you need}
+\KeywordTok{load}\NormalTok{(}\KeywordTok{here}\NormalTok{(}\StringTok{"peb_data"}\NormalTok{, }\StringTok{"PEB_2020.RData"}\NormalTok{))}
+
+\CommentTok{# Check what data you loaded}
+\KeywordTok{ls}\NormalTok{()}
+\CommentTok{## [1] "demo"  "exp"   "width"}
+\end{Highlighting}
+\end{Shaded}
+
+The \textbf{exp} is the data frame containing raw counts.
+
+The \textbf{demo} is the demographic data with some biological and technical covariates
+
+The \textbf{width} is the length of the the genes for data normalizations.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Check the dimension of exp}
+\KeywordTok{dim}\NormalTok{(exp)}
+\CommentTok{## [1] 13291    30}
+
+\CommentTok{# Let's have a look to the data distribution of the}
+\CommentTok{# expression}
+\KeywordTok{summary}\NormalTok{(exp)}
+\CommentTok{##      Hsap_1           Hsap_2           Hsap_3      }
+\CommentTok{##  Min.   :     0   Min.   :     0   Min.   :     0  }
+\CommentTok{##  1st Qu.:    28   1st Qu.:    13   1st Qu.:    14  }
+\CommentTok{##  Median :   464   Median :   156   Median :   195  }
+\CommentTok{##  Mean   :  3415   Mean   :  1209   Mean   :  1427  }
+\CommentTok{##  3rd Qu.:  2256   3rd Qu.:   787   3rd Qu.:   974  }
+\CommentTok{##  Max.   :755442   Max.   :252898   Max.   :266769  }
+\CommentTok{##      Hsap_4           Hsap_5           Hsap_6      }
+\CommentTok{##  Min.   :     0   Min.   :     0   Min.   :     0  }
+\CommentTok{##  1st Qu.:     9   1st Qu.:    13   1st Qu.:    12  }
+\CommentTok{##  Median :   110   Median :   163   Median :   176  }
+\CommentTok{##  Mean   :   977   Mean   :  1419   Mean   :  1217  }
+\CommentTok{##  3rd Qu.:   578   3rd Qu.:   882   3rd Qu.:   823  }
+\CommentTok{##  Max.   :208039   Max.   :310497   Max.   :235453  }
+\CommentTok{##      Hsap_7           Hsap_8           Hsap_9      }
+\CommentTok{##  Min.   :     0   Min.   :     0   Min.   :     0  }
+\CommentTok{##  1st Qu.:    19   1st Qu.:    14   1st Qu.:     9  }
+\CommentTok{##  Median :   238   Median :   142   Median :   132  }
+\CommentTok{##  Mean   :  1150   Mean   :  1080   Mean   :  1212  }
+\CommentTok{##  3rd Qu.:   990   3rd Qu.:   642   3rd Qu.:   704  }
+\CommentTok{##  Max.   :156780   Max.   :208555   Max.   :306040  }
+\CommentTok{##     Hsap_10          PanTro_1        PanTro_2     }
+\CommentTok{##  Min.   :     0   Min.   :    0   Min.   :     0  }
+\CommentTok{##  1st Qu.:     9   1st Qu.:    8   1st Qu.:    13  }
+\CommentTok{##  Median :   146   Median :   72   Median :   188  }
+\CommentTok{##  Mean   :  1312   Mean   :  363   Mean   :  1942  }
+\CommentTok{##  3rd Qu.:   774   3rd Qu.:  321   3rd Qu.:  1048  }
+\CommentTok{##  Max.   :291565   Max.   :42193   Max.   :492501  }
+\CommentTok{##     PanTro_3        PanTro_4         PanTro_5     }
+\CommentTok{##  Min.   :    0   Min.   :     0   Min.   :     0  }
+\CommentTok{##  1st Qu.:    0   1st Qu.:     9   1st Qu.:     7  }
+\CommentTok{##  Median :   50   Median :   139   Median :   113  }
+\CommentTok{##  Mean   :  312   Mean   :  1125   Mean   :  1218  }
+\CommentTok{##  3rd Qu.:  235   3rd Qu.:   697   3rd Qu.:   670  }
+\CommentTok{##  Max.   :60608   Max.   :257678   Max.   :214389  }
+\CommentTok{##     PanTro_6         PanTro_7        PanTro_8     }
+\CommentTok{##  Min.   :     0   Min.   :    0   Min.   :     0  }
+\CommentTok{##  1st Qu.:     6   1st Qu.:   24   1st Qu.:    12  }
+\CommentTok{##  Median :    69   Median :  268   Median :   173  }
+\CommentTok{##  Mean   :   575   Mean   : 1067   Mean   :  1447  }
+\CommentTok{##  3rd Qu.:   345   3rd Qu.: 1000   3rd Qu.:   910  }
+\CommentTok{##  Max.   :170033   Max.   :92973   Max.   :345260  }
+\CommentTok{##     PanTro_9        PanTro_10         RheMac_1     }
+\CommentTok{##  Min.   :     0   Min.   :     0   Min.   :     0  }
+\CommentTok{##  1st Qu.:    12   1st Qu.:    15   1st Qu.:     9  }
+\CommentTok{##  Median :   165   Median :   169   Median :   136  }
+\CommentTok{##  Mean   :   995   Mean   :   936   Mean   :  1053  }
+\CommentTok{##  3rd Qu.:   695   3rd Qu.:   727   3rd Qu.:   678  }
+\CommentTok{##  Max.   :155820   Max.   :139103   Max.   :210549  }
+\CommentTok{##     RheMac_2        RheMac_3         RheMac_4    }
+\CommentTok{##  Min.   :    0   Min.   :     0   Min.   :    0  }
+\CommentTok{##  1st Qu.:   13   1st Qu.:     5   1st Qu.:    6  }
+\CommentTok{##  Median :  156   Median :    76   Median :   98  }
+\CommentTok{##  Mean   :  713   Mean   :   803   Mean   :  538  }
+\CommentTok{##  3rd Qu.:  610   3rd Qu.:   432   3rd Qu.:  419  }
+\CommentTok{##  Max.   :85555   Max.   :188456   Max.   :87970  }
+\CommentTok{##     RheMac_5        RheMac_6         RheMac_7    }
+\CommentTok{##  Min.   :    0   Min.   :     0   Min.   :    0  }
+\CommentTok{##  1st Qu.:    9   1st Qu.:     7   1st Qu.:   12  }
+\CommentTok{##  Median :   98   Median :   103   Median :  148  }
+\CommentTok{##  Mean   :  492   Mean   :   919   Mean   :  706  }
+\CommentTok{##  3rd Qu.:  399   3rd Qu.:   522   3rd Qu.:  590  }
+\CommentTok{##  Max.   :52623   Max.   :199397   Max.   :64114  }
+\CommentTok{##     RheMac_8         RheMac_9       RheMac_10     }
+\CommentTok{##  Min.   :     0   Min.   :    0   Min.   :     0  }
+\CommentTok{##  1st Qu.:    14   1st Qu.:    8   1st Qu.:     4  }
+\CommentTok{##  Median :   177   Median :   78   Median :    65  }
+\CommentTok{##  Mean   :  1137   Mean   :  429   Mean   :   697  }
+\CommentTok{##  3rd Qu.:   750   3rd Qu.:  334   3rd Qu.:   365  }
+\CommentTok{##  Max.   :268860   Max.   :46577   Max.   :182266}
+
+\KeywordTok{boxplot}\NormalTok{(exp)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics[width=0.65\linewidth]{bookdown-demo_files/figure-latex/checkData-1} \end{center}
+
+\hypertarget{demographic-screening}{%
+\subsection{Demographic screening}\label{demographic-screening}}
+
+Demographics are important to understand what type of data you are dealing with.
+There are several factors that can influence expression: some are categorical variables (e.g.~Sex, Hemisphere), others are continous variables (e.g.~Age).
+These typically are important covariates to take into account into the analysis.
+In principle, RNA-seq is a snapshot of the gene expression in a specific moment of time from a specific tissue (bulk RNA-seq) or cell-type (single cell RNA-seq).
+
+Different factors can play a role in explaining partially the variance of the gene expression you see.
+
+For instance, gender can slightly differentiate gene expression therefore we presume it will have a minimal impact on gene expression variance. On the other hand variables like PMI (Post-mortem interval), RIN (rna integrity number), Brain Bank (the institute where you collect the data), Batch (sequencing days and hands), and Age (the age of the individual who donated the tissue) might have a sever impact on the gene expression variance.
+
+These variables must be taken into account when RNA-seq (but also other genomics) is analyzed.
+
+Now let's see what we have in the demographic
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{head}\NormalTok{(demo)}
+\CommentTok{##        Species Sex Age RIN Hemisphere PMI}
+\CommentTok{## Hsap_1    Hsap   M  42 9.8          L  13}
+\CommentTok{## Hsap_2    Hsap   M  39 6.4          L  11}
+\CommentTok{## Hsap_3    Hsap   F  25 8.8          R  18}
+\CommentTok{## Hsap_4    Hsap   F  21 7.9          L   6}
+\CommentTok{## Hsap_5    Hsap   M  45 6.6          L  16}
+\CommentTok{## Hsap_6    Hsap   M  25 5.8          R   5}
+
+\KeywordTok{str}\NormalTok{(demo)}
+\CommentTok{## 'data.frame':    30 obs. of  6 variables:}
+\CommentTok{##  $ Species   : Factor w/ 3 levels "Hsap","PanTro",..: 1 1 1 1 1 1 1 1 1 1 ...}
+\CommentTok{##  $ Sex       : Factor w/ 2 levels "F","M": 2 2 1 1 2 2 1 2 2 2 ...}
+\CommentTok{##  $ Age       : int  42 39 25 21 45 25 26 39 31 39 ...}
+\CommentTok{##  $ RIN       : num  9.8 6.4 8.8 7.9 6.6 5.8 8.7 6.6 8.1 2.7 ...}
+\CommentTok{##  $ Hemisphere: Factor w/ 2 levels "L","R": 1 1 2 1 1 2 2 2 2 2 ...}
+\CommentTok{##  $ PMI       : int  13 11 18 6 16 5 19 18 10 18 ...}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{data-normalization}{%
+\subsection{Data normalization}\label{data-normalization}}
+
+Do you see something weird in the boxplot?
+
+Pretty sure you realized that the distribution is skewed toward the bottom.
+
+There are several factors that can influence this:
+
+\begin{itemize}
+\item
+  Library size: sequencing depth.
+\item
+  Gene lenght: long gens = more reads
+\item
+  Library composition: some biological factors can influence the transcriptome between samples.
+\item
+  GC content: GC can influence mappability, therefore gene count.
+\end{itemize}
+
+Several methods have been developped to normalize the values prior downstream analysis.
+Here some examples:
+
+\begin{itemize}
+\item
+  \textbf{CPM} (\emph{Counts per million}): no length considered
+\item
+  \textbf{RPKM} (\emph{Reads per kilobase per million}): length considered
+\item
+  \textbf{TPM} (\emph{Transcript per million}): length considered
+\item
+  \textbf{CQN} (\emph{Conditional quantile normalization}): length and GC content considered
+\end{itemize}
+
+\hypertarget{calculate-cpm}{%
+\subsubsection{Calculate CPM}\label{calculate-cpm}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Let's calculate the CPM}
+\KeywordTok{plan}\NormalTok{(multiprocess)}
+
+\CommentTok{# future.apply is an alternative of the standard apply that}
+\CommentTok{# goes in parallel.  here we apply a function to the}
+\CommentTok{# expression matrix dividing each column by the total reads *}
+\CommentTok{# one million.}
+\NormalTok{cpm <-}\StringTok{ }\KeywordTok{future_apply}\NormalTok{(exp, }\DecValTok{2}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(x) x}\OperatorTok{/}\KeywordTok{sum}\NormalTok{(}\KeywordTok{as.numeric}\NormalTok{(x)) }\OperatorTok{*}\StringTok{ }
+\StringTok{  }\DecValTok{10}\OperatorTok{^}\DecValTok{6}\NormalTok{)}
+
+\CommentTok{# Let's have a look!}
+\KeywordTok{head}\NormalTok{(cpm)}
+\CommentTok{##          Hsap_1  Hsap_2 Hsap_3  Hsap_4 Hsap_5  Hsap_6}
+\CommentTok{## A1BG    3.65692 12.6344 7.4863 31.5862 9.3343 14.0957}
+\CommentTok{## A1CF    0.15421  0.3734 0.1582  0.0000 0.5834  0.1236}
+\CommentTok{## A2M     1.49801  4.1077 0.4218  0.0000 2.5457  1.5456}
+\CommentTok{## A2ML1   0.41856  0.9958 0.4218  0.2311 1.0607  0.6182}
+\CommentTok{## A3GALT2 1.93861  2.3651 1.9507  0.6934 0.5304  1.6692}
+\CommentTok{## A4GALT  0.02203  0.2490 0.1054  0.1541 0.0000  0.1236}
+\CommentTok{##         Hsap_7    Hsap_8  Hsap_9 Hsap_10 PanTro_1 PanTro_2}
+\CommentTok{## A1BG    5.6898 194.65722 14.0305  2.4087  11.1888  0.23248}
+\CommentTok{## A1CF    0.1962   0.06969  0.0000  0.0000   0.0000  0.00000}
+\CommentTok{## A2M     1.1118   0.62725  0.6829  0.4588   1.2432  4.92086}
+\CommentTok{## A2ML1   0.9810   3.13626  0.0000  0.4015   5.5944  0.11624}
+\CommentTok{## A3GALT2 3.2046  11.70870  1.3037  0.4588   3.9368  0.19373}
+\CommentTok{## A4GALT  0.1962   0.62725  0.2483  0.0000   0.2072  0.03875}
+\CommentTok{##         PanTro_3 PanTro_4 PanTro_5 PanTro_6 PanTro_7}
+\CommentTok{## A1BG      23.145  1.33764  0.74119   3.4020   7.3308}
+\CommentTok{## A1CF       0.000  0.06688  0.06177   0.0000   0.2115}
+\CommentTok{## A2M        5.545  0.13376  1.05002   1.8318   0.6344}
+\CommentTok{## A2ML1      0.000  0.53506  0.24706   0.3925   1.4098}
+\CommentTok{## A3GALT2    6.751  1.20388  0.43236   1.0468   4.1588}
+\CommentTok{## A4GALT     0.000  0.00000  0.00000   0.2617   0.4229}
+\CommentTok{##         PanTro_8 PanTro_9 PanTro_10 RheMac_1 RheMac_2}
+\CommentTok{## A1BG      0.7277   5.2930    4.3415   0.5717   1.1613}
+\CommentTok{## A1CF      0.3639   0.8318    0.0804   0.2144   0.1056}
+\CommentTok{## A2M       1.7153   1.1342    0.4020   0.6431   0.7390}
+\CommentTok{## A2ML1     0.6238   1.5879    1.2864   0.2858   0.5279}
+\CommentTok{## A3GALT2   0.6238   2.3440    4.8239   1.0004   0.9502}
+\CommentTok{## A4GALT    0.1559   0.3781    0.0000   0.2858   0.2112}
+\CommentTok{##         RheMac_3 RheMac_4 RheMac_5 RheMac_6 RheMac_7}
+\CommentTok{## A1BG      0.1875   0.1398   1.5296   0.0000   3.0919}
+\CommentTok{## A1CF      0.1875   0.0000   0.0000   0.0000   0.1066}
+\CommentTok{## A2M       2.2501   0.0000   1.9885   2.3751   0.7463}
+\CommentTok{## A2ML1     0.1875   0.6988   0.7648   0.1638   0.6397}
+\CommentTok{## A3GALT2   0.1875   0.0000   1.5296   0.4914   1.0662}
+\CommentTok{## A4GALT    0.0000   0.1398   0.0000   0.0819   0.3198}
+\CommentTok{##         RheMac_8 RheMac_9 RheMac_10}
+\CommentTok{## A1BG     0.06617   0.7008    0.6475}
+\CommentTok{## A1CF     0.06617   0.1752    0.0000}
+\CommentTok{## A2M      7.27894   2.2776    1.0792}
+\CommentTok{## A2ML1    0.52938   0.3504    0.0000}
+\CommentTok{## A3GALT2  0.99258   3.6793    0.7555}
+\CommentTok{## A4GALT   0.13234   0.0000    0.0000}
+
+\CommentTok{# The sum of each column is = 10^6.}
+\KeywordTok{colSums}\NormalTok{(cpm)}
+\CommentTok{##    Hsap_1    Hsap_2    Hsap_3    Hsap_4    Hsap_5    Hsap_6 }
+\CommentTok{##     1e+06     1e+06     1e+06     1e+06     1e+06     1e+06 }
+\CommentTok{##    Hsap_7    Hsap_8    Hsap_9   Hsap_10  PanTro_1  PanTro_2 }
+\CommentTok{##     1e+06     1e+06     1e+06     1e+06     1e+06     1e+06 }
+\CommentTok{##  PanTro_3  PanTro_4  PanTro_5  PanTro_6  PanTro_7  PanTro_8 }
+\CommentTok{##     1e+06     1e+06     1e+06     1e+06     1e+06     1e+06 }
+\CommentTok{##  PanTro_9 PanTro_10  RheMac_1  RheMac_2  RheMac_3  RheMac_4 }
+\CommentTok{##     1e+06     1e+06     1e+06     1e+06     1e+06     1e+06 }
+\CommentTok{##  RheMac_5  RheMac_6  RheMac_7  RheMac_8  RheMac_9 RheMac_10 }
+\CommentTok{##     1e+06     1e+06     1e+06     1e+06     1e+06     1e+06}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{calculate-rpkm}{%
+\subsubsection{Calculate RPKM}\label{calculate-rpkm}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# For RPKM you need the length of the genes (width)}
+\KeywordTok{head}\NormalTok{(width)}
+\CommentTok{##      Gene Length GCperc}
+\CommentTok{## 1    A1BG   4006 0.5580}
+\CommentTok{## 2    A1CF   9603 0.3624}
+\CommentTok{## 3     A2M   6384 0.3718}
+\CommentTok{## 4   A2ML1   7303 0.4423}
+\CommentTok{## 5 A3GALT2   1023 0.5419}
+\CommentTok{## 6  A4GALT   2943 0.5239}
+
+\CommentTok{# let's create a vector with the gene length}
+\NormalTok{l <-}\StringTok{ }\KeywordTok{as.vector}\NormalTok{(width}\OperatorTok{$}\NormalTok{Length)}
+
+\CommentTok{# Calculate the RPKM}
+\NormalTok{rpkm <-}\StringTok{ }\KeywordTok{future_apply}\NormalTok{(exp, }\DecValTok{2}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(x) }\DecValTok{10}\OperatorTok{^}\DecValTok{9} \OperatorTok{*}\StringTok{ }\NormalTok{x}\OperatorTok{/}\NormalTok{l}\OperatorTok{/}\KeywordTok{sum}\NormalTok{(}\KeywordTok{as.numeric}\NormalTok{(x)))}
+
+\CommentTok{# Let's have a look!}
+\KeywordTok{head}\NormalTok{(rpkm)}
+\CommentTok{##           Hsap_1  Hsap_2  Hsap_3  Hsap_4  Hsap_5  Hsap_6}
+\CommentTok{## A1BG    0.912860 3.15386 1.86878 7.88473 2.33008 3.51865}
+\CommentTok{## A1CF    0.016058 0.03889 0.01647 0.00000 0.06075 0.01288}
+\CommentTok{## A2M     0.234651 0.64344 0.06607 0.00000 0.39877 0.24210}
+\CommentTok{## A2ML1   0.057314 0.13636 0.05775 0.03165 0.14524 0.08465}
+\CommentTok{## A3GALT2 1.895021 2.31188 1.90681 0.67777 0.51843 1.63170}
+\CommentTok{## A4GALT  0.007485 0.08459 0.03583 0.05235 0.00000 0.04201}
+\CommentTok{##          Hsap_7    Hsap_8  Hsap_9 Hsap_10 PanTro_1 PanTro_2}
+\CommentTok{## A1BG    1.42033 48.591418 3.50236 0.60128   2.7930  0.05803}
+\CommentTok{## A1CF    0.02043  0.007258 0.00000 0.00000   0.0000  0.00000}
+\CommentTok{## A2M     0.17416  0.098254 0.10697 0.07187   0.1947  0.77081}
+\CommentTok{## A2ML1   0.13433  0.429448 0.00000 0.05497   0.7660  0.01592}
+\CommentTok{## A3GALT2 3.13257 11.445459 1.27441 0.44849   3.8483  0.18938}
+\CommentTok{## A4GALT  0.06667  0.213134 0.08438 0.00000   0.0704  0.01317}
+\CommentTok{##         PanTro_3 PanTro_4 PanTro_5 PanTro_6 PanTro_7}
+\CommentTok{## A1BG      5.7777 0.333909 0.185019  0.84922  1.82995}
+\CommentTok{## A1CF      0.0000 0.006965 0.006432  0.00000  0.02202}
+\CommentTok{## A2M       0.8686 0.020953 0.164476  0.28694  0.09937}
+\CommentTok{## A2ML1     0.0000 0.073265 0.033830  0.05375  0.19304}
+\CommentTok{## A3GALT2   6.5989 1.176810 0.422639  1.02322  4.06531}
+\CommentTok{## A4GALT    0.0000 0.000000 0.000000  0.08892  0.14371}
+\CommentTok{##         PanTro_8 PanTro_9 PanTro_10 RheMac_1 RheMac_2}
+\CommentTok{## A1BG     0.18166  1.32126  1.083746  0.14270  0.28990}
+\CommentTok{## A1CF     0.03789  0.08661  0.008372  0.02232  0.01099}
+\CommentTok{## A2M      0.26869  0.17766  0.062968  0.10074  0.11576}
+\CommentTok{## A2ML1    0.08541  0.21743  0.176142  0.03914  0.07228}
+\CommentTok{## A3GALT2  0.60974  2.29133  4.715420  0.97791  0.92883}
+\CommentTok{## A4GALT   0.05299  0.12846  0.000000  0.09712  0.07175}
+\CommentTok{##         RheMac_3 RheMac_4 RheMac_5 RheMac_6 RheMac_7}
+\CommentTok{## A1BG     0.04681  0.03489   0.3818  0.00000  0.77181}
+\CommentTok{## A1CF     0.01953  0.00000   0.0000  0.00000  0.01110}
+\CommentTok{## A2M      0.35246  0.00000   0.3115  0.37203  0.11690}
+\CommentTok{## A2ML1    0.02568  0.09569   0.1047  0.02243  0.08759}
+\CommentTok{## A3GALT2  0.18329  0.00000   1.4952  0.48034  1.04219}
+\CommentTok{## A4GALT   0.00000  0.04749   0.0000  0.02783  0.10868}
+\CommentTok{##         RheMac_8 RheMac_9 RheMac_10}
+\CommentTok{## A1BG    0.016518  0.17494    0.1616}
+\CommentTok{## A1CF    0.006891  0.01824    0.0000}
+\CommentTok{## A2M     1.140185  0.35677    0.1691}
+\CommentTok{## A2ML1   0.072488  0.04798    0.0000}
+\CommentTok{## A3GALT2 0.970267  3.59655    0.7385}
+\CommentTok{## A4GALT  0.044969  0.00000    0.0000}
+
+\CommentTok{# Now the sum are all different!.}
+\KeywordTok{colSums}\NormalTok{(rpkm)}
+\CommentTok{##    Hsap_1    Hsap_2    Hsap_3    Hsap_4    Hsap_5    Hsap_6 }
+\CommentTok{##    135992    137546    136729    136757    135507    137081 }
+\CommentTok{##    Hsap_7    Hsap_8    Hsap_9   Hsap_10  PanTro_1  PanTro_2 }
+\CommentTok{##    140837    140161    135588    134455    149958    133939 }
+\CommentTok{##  PanTro_3  PanTro_4  PanTro_5  PanTro_6  PanTro_7  PanTro_8 }
+\CommentTok{##    145104    135347    132978    138628    141954    135596 }
+\CommentTok{##  PanTro_9 PanTro_10  RheMac_1  RheMac_2  RheMac_3  RheMac_4 }
+\CommentTok{##    138648    139438    134781    142715    132472    139544 }
+\CommentTok{##  RheMac_5  RheMac_6  RheMac_7  RheMac_8  RheMac_9 RheMac_10 }
+\CommentTok{##    141869    133605    140033    136176    142478    132871}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{calculate-tpm}{%
+\subsubsection{Calculate TPM}\label{calculate-tpm}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# For TPM you need the length of the genes (l)}
+
+\CommentTok{# First step: Calculate the reads per kilobase}
+\NormalTok{rpk <-}\StringTok{ }\KeywordTok{future_apply}\NormalTok{(exp, }\DecValTok{2}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(x) x}\OperatorTok{/}\NormalTok{(l}\OperatorTok{/}\DecValTok{1000}\NormalTok{))}
+
+\CommentTok{# Now the TPM}
+\NormalTok{tpm <-}\StringTok{ }\KeywordTok{future_apply}\NormalTok{(rpk, }\DecValTok{2}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(x) x}\OperatorTok{/}\KeywordTok{sum}\NormalTok{(}\KeywordTok{as.numeric}\NormalTok{(x)) }\OperatorTok{*}\StringTok{ }
+\StringTok{  }\DecValTok{10}\OperatorTok{^}\DecValTok{6}\NormalTok{)}
+
+\CommentTok{# Let's have a look!}
+\KeywordTok{head}\NormalTok{(tpm)}
+\CommentTok{##           Hsap_1  Hsap_2  Hsap_3  Hsap_4  Hsap_5   Hsap_6}
+\CommentTok{## A1BG     6.71259 22.9295 13.6678 57.6550 17.1953 25.66842}
+\CommentTok{## A1CF     0.11808  0.2827  0.1205  0.0000  0.4483  0.09393}
+\CommentTok{## A2M      1.72548  4.6780  0.4832  0.0000  2.9428  1.76613}
+\CommentTok{## A2ML1    0.42145  0.9914  0.4224  0.2314  1.0719  0.61755}
+\CommentTok{## A3GALT2 13.93477 16.8080 13.9459  4.9560  3.8259 11.90319}
+\CommentTok{## A4GALT   0.05504  0.6150  0.2620  0.3828  0.0000  0.30649}
+\CommentTok{##          Hsap_7    Hsap_8  Hsap_9 Hsap_10 PanTro_1 PanTro_2}
+\CommentTok{## A1BG    10.0849 346.68275 25.8309  4.4720  18.6252   0.4333}
+\CommentTok{## A1CF     0.1451   0.05178  0.0000  0.0000   0.0000   0.0000}
+\CommentTok{## A2M      1.2366   0.70101  0.7889  0.5345   1.2986   5.7550}
+\CommentTok{## A2ML1    0.9538   3.06396  0.0000  0.4088   5.1083   0.1188}
+\CommentTok{## A3GALT2 22.2425  81.65935  9.3991  3.3356  25.6623   1.4139}
+\CommentTok{## A4GALT   0.4734   1.52063  0.6223  0.0000   0.4695   0.0983}
+\CommentTok{##         PanTro_3 PanTro_4 PanTro_5 PanTro_6 PanTro_7}
+\CommentTok{## A1BG      39.817  2.46706  1.39135   6.1259  12.8912}
+\CommentTok{## A1CF       0.000  0.05146  0.04837   0.0000   0.1551}
+\CommentTok{## A2M        5.986  0.15481  1.23687   2.0699   0.7000}
+\CommentTok{## A2ML1      0.000  0.54131  0.25441   0.3877   1.3599}
+\CommentTok{## A3GALT2   45.477  8.69476  3.17826   7.3811  28.6383}
+\CommentTok{## A4GALT     0.000  0.00000  0.00000   0.6414   1.0124}
+\CommentTok{##         PanTro_8 PanTro_9 PanTro_10 RheMac_1 RheMac_2}
+\CommentTok{## A1BG      1.3397   9.5296   7.77226   1.0588  2.03133}
+\CommentTok{## A1CF      0.2794   0.6247   0.06004   0.1656  0.07704}
+\CommentTok{## A2M       1.9816   1.2814   0.45159   0.7474  0.81116}
+\CommentTok{## A2ML1     0.6299   1.5682   1.26323   0.2904  0.50649}
+\CommentTok{## A3GALT2   4.4967  16.5262  33.81741   7.2556  6.50828}
+\CommentTok{## A4GALT    0.3908   0.9265   0.00000   0.7206  0.50274}
+\CommentTok{##         RheMac_3 RheMac_4 RheMac_5 RheMac_6 RheMac_7}
+\CommentTok{## A1BG      0.3533   0.2500   2.6915   0.0000  5.51160}
+\CommentTok{## A1CF      0.1474   0.0000   0.0000   0.0000  0.07928}
+\CommentTok{## A2M       2.6606   0.0000   2.1956   2.7846  0.83483}
+\CommentTok{## A2ML1     0.1938   0.6857   0.7382   0.1679  0.62552}
+\CommentTok{## A3GALT2   1.3836   0.0000  10.5396   3.5953  7.44243}
+\CommentTok{## A4GALT    0.0000   0.3403   0.0000   0.2083  0.77611}
+\CommentTok{##         RheMac_8 RheMac_9 RheMac_10}
+\CommentTok{## A1BG      0.1213   1.2278     1.217}
+\CommentTok{## A1CF      0.0506   0.1281     0.000}
+\CommentTok{## A2M       8.3729   2.5041     1.272}
+\CommentTok{## A2ML1     0.5323   0.3368     0.000}
+\CommentTok{## A3GALT2   7.1251  25.2428     5.558}
+\CommentTok{## A4GALT    0.3302   0.0000     0.000}
+
+\CommentTok{# The sum of each column is = 10^6!.}
+\KeywordTok{colSums}\NormalTok{(tpm)}
+\CommentTok{##    Hsap_1    Hsap_2    Hsap_3    Hsap_4    Hsap_5    Hsap_6 }
+\CommentTok{##     1e+06     1e+06     1e+06     1e+06     1e+06     1e+06 }
+\CommentTok{##    Hsap_7    Hsap_8    Hsap_9   Hsap_10  PanTro_1  PanTro_2 }
+\CommentTok{##     1e+06     1e+06     1e+06     1e+06     1e+06     1e+06 }
+\CommentTok{##  PanTro_3  PanTro_4  PanTro_5  PanTro_6  PanTro_7  PanTro_8 }
+\CommentTok{##     1e+06     1e+06     1e+06     1e+06     1e+06     1e+06 }
+\CommentTok{##  PanTro_9 PanTro_10  RheMac_1  RheMac_2  RheMac_3  RheMac_4 }
+\CommentTok{##     1e+06     1e+06     1e+06     1e+06     1e+06     1e+06 }
+\CommentTok{##  RheMac_5  RheMac_6  RheMac_7  RheMac_8  RheMac_9 RheMac_10 }
+\CommentTok{##     1e+06     1e+06     1e+06     1e+06     1e+06     1e+06}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{calculate-cqn}{%
+\subsubsection{Calculate CQN}\label{calculate-cqn}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{suppressPackageStartupMessages}\NormalTok{(}\KeywordTok{library}\NormalTok{(cqn))}
+
+\CommentTok{# let's create a vector with the gene length and gc content}
+\NormalTok{length <-}\StringTok{ }\KeywordTok{as.vector}\NormalTok{(width}\OperatorTok{$}\NormalTok{Length)}
+\NormalTok{gc_content <-}\StringTok{ }\KeywordTok{as.vector}\NormalTok{(width}\OperatorTok{$}\NormalTok{GCperc)}
+
+\CommentTok{# Calculate CQN and normalized values}
+\NormalTok{temp <-}\StringTok{ }\KeywordTok{cqn}\NormalTok{(exp, }\DataTypeTok{lengths =}\NormalTok{ length, }\DataTypeTok{x =}\NormalTok{ gc_content, }\DataTypeTok{sizeFactors =} \KeywordTok{colSums}\NormalTok{(exp), }
+  \DataTypeTok{lengthMethod =} \StringTok{"fixed"}\NormalTok{, }\DataTypeTok{sqn =} \OtherTok{FALSE}\NormalTok{)}
+
+\CommentTok{# get log2(normalized RPKM) values}
+\NormalTok{quantGC <-}\StringTok{ }\DecValTok{2}\OperatorTok{^}\NormalTok{(temp}\OperatorTok{$}\NormalTok{y }\OperatorTok{+}\StringTok{ }\NormalTok{temp}\OperatorTok{$}\NormalTok{offset)}
+
+\CommentTok{# Let's have a look!}
+\KeywordTok{head}\NormalTok{(quantGC)}
+\CommentTok{##          Hsap_1   Hsap_2  Hsap_3    Hsap_4  Hsap_5  Hsap_6}
+\CommentTok{## A1BG    2.56927 10.55845 5.08924 30.841415 9.74631 8.55624}
+\CommentTok{## A1CF    0.01205  0.02649 0.01316  0.004706 0.03552 0.01240}
+\CommentTok{## A2M     0.15803  0.39396 0.04539  0.007449 0.23461 0.16546}
+\CommentTok{## A2ML1   0.06277  0.15799 0.06846  0.054177 0.18876 0.09853}
+\CommentTok{## A3GALT2 4.70302  6.63554 4.55666  2.526362 1.98350 3.65302}
+\CommentTok{## A4GALT  0.03149  0.24275 0.10567  0.220901 0.05107 0.11910}
+\CommentTok{##          Hsap_7   Hsap_8    Hsap_9  Hsap_10 PanTro_1}
+\CommentTok{## A1BG    1.52687 156.7761 15.730795 2.678769  1.68308}
+\CommentTok{## A1CF    0.01873   0.0109  0.004176 0.003558  0.03280}
+\CommentTok{## A2M     0.12593   0.0843  0.080090 0.050280  0.30675}
+\CommentTok{## A2ML1   0.12394   0.5023  0.011012 0.078499  0.64153}
+\CommentTok{## A3GALT2 3.36678  30.5082  4.944737 1.853574  2.52037}
+\CommentTok{## A4GALT  0.09204   0.5077  0.314778 0.058764  0.09251}
+\CommentTok{##         PanTro_2 PanTro_3 PanTro_4 PanTro_5 PanTro_6}
+\CommentTok{## A1BG    0.323282  7.57013 1.203895 1.307150  2.22728}
+\CommentTok{## A1CF    0.002187  0.02701 0.008085 0.006478  0.01398}
+\CommentTok{## A2M     0.456473  0.90128 0.018918 0.093457  0.29765}
+\CommentTok{## A2ML1   0.032910  0.02960 0.100878 0.059772  0.08046}
+\CommentTok{## A3GALT2 0.968989  8.16268 3.743524 2.591185  2.57671}
+\CommentTok{## A4GALT  0.097419  0.08978 0.058774 0.089540  0.25963}
+\CommentTok{##         PanTro_7 PanTro_8 PanTro_9 PanTro_10 RheMac_1}
+\CommentTok{## A1BG     1.36851  0.80972  1.83918   1.15951  0.47642}
+\CommentTok{## A1CF     0.02369  0.02137  0.08902   0.01406  0.01753}
+\CommentTok{## A2M      0.08660  0.14582  0.17202   0.06197  0.06846}
+\CommentTok{## A2ML1    0.14986  0.11238  0.22794   0.17717  0.05387}
+\CommentTok{## A3GALT2  3.05732  2.36518  3.10524   5.06858  2.79150}
+\CommentTok{## A4GALT   0.12378  0.21146  0.19201   0.02893  0.28296}
+\CommentTok{##         RheMac_2 RheMac_3 RheMac_4 RheMac_5 RheMac_6}
+\CommentTok{## A1BG     0.24532  0.38822  0.09098  0.35784 0.073764}
+\CommentTok{## A1CF     0.02100  0.01422  0.01176  0.01670 0.005465}
+\CommentTok{## A2M      0.11888  0.19411  0.01709  0.32997 0.255428}
+\CommentTok{## A2ML1    0.06967  0.05314  0.10073  0.10292 0.042981}
+\CommentTok{## A3GALT2  0.80543  1.29033  0.16979  1.39610 1.816089}
+\CommentTok{## A4GALT   0.08459  0.12283  0.11129  0.04386 0.157588}
+\CommentTok{##         RheMac_7 RheMac_8 RheMac_9 RheMac_10}
+\CommentTok{## A1BG     0.66299  0.05289  0.17867  1.095789}
+\CommentTok{## A1CF     0.02118  0.01095  0.04853  0.005946}
+\CommentTok{## A2M      0.12278  0.92096  0.46590  0.106475}
+\CommentTok{## A2ML1    0.08463  0.09071  0.06470  0.021158}
+\CommentTok{## A3GALT2  0.95892  1.61560  3.16347  4.244491}
+\CommentTok{## A4GALT   0.12191  0.10148  0.05126  0.153846}
+
+\CommentTok{# The sum of each column is = 10^6!.}
+\KeywordTok{colSums}\NormalTok{(quantGC)}
+\CommentTok{##    Hsap_1    Hsap_2    Hsap_3    Hsap_4    Hsap_5    Hsap_6 }
+\CommentTok{##    136938    135675    132641    148347    140195    136839 }
+\CommentTok{##    Hsap_7    Hsap_8    Hsap_9   Hsap_10  PanTro_1  PanTro_2 }
+\CommentTok{##    117928    159501    155370    143235    133363    149459 }
+\CommentTok{##  PanTro_3  PanTro_4  PanTro_5  PanTro_6  PanTro_7  PanTro_8 }
+\CommentTok{##    147426    134711    138760    165924    108437    128301 }
+\CommentTok{##  PanTro_9 PanTro_10  RheMac_1  RheMac_2  RheMac_3  RheMac_4 }
+\CommentTok{##    143486    132448    132904    120266    134040    128488 }
+\CommentTok{##  RheMac_5  RheMac_6  RheMac_7  RheMac_8  RheMac_9 RheMac_10 }
+\CommentTok{##    127934    145847    122743    142587    140086    137997}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{check-the-normalized-data}{%
+\subsubsection{Check the normalized data}\label{check-the-normalized-data}}
+
+Now we can have a look to the distribution of the normalized data
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Let's color based on the species}
+\NormalTok{colors <-}\StringTok{ }\KeywordTok{as.numeric}\NormalTok{(}\KeywordTok{factor}\NormalTok{(demo}\OperatorTok{$}\NormalTok{Species)) }\OperatorTok{+}\StringTok{ }\DecValTok{1}
+
+\CommentTok{# Check the boxplot for CPM}
+
+\KeywordTok{boxplot}\NormalTok{(cpm)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics[width=0.65\linewidth]{bookdown-demo_files/figure-latex/normDistrib-1} \end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{# Still skewed? Let's make every normally distributed the +1}
+\CommentTok{# is a offset reads to keep the 0 as 0!}
+\KeywordTok{boxplot}\NormalTok{(}\KeywordTok{log2}\NormalTok{(cpm }\OperatorTok{+}\StringTok{ }\DecValTok{1}\NormalTok{), }\DataTypeTok{notch =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{main =} \StringTok{"log2(CPM+1)"}\NormalTok{, }\DataTypeTok{col =}\NormalTok{ colors)}
+\KeywordTok{abline}\NormalTok{(}\DataTypeTok{h =} \KeywordTok{median}\NormalTok{(}\KeywordTok{log2}\NormalTok{(cpm }\OperatorTok{+}\StringTok{ }\DecValTok{1}\NormalTok{)), }\DataTypeTok{col =} \StringTok{"blue"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics[width=0.65\linewidth]{bookdown-demo_files/figure-latex/normDistrib-2} \end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\KeywordTok{boxplot}\NormalTok{(}\KeywordTok{log2}\NormalTok{(rpkm }\OperatorTok{+}\StringTok{ }\DecValTok{1}\NormalTok{), }\DataTypeTok{notch =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{main =} \StringTok{"log2(RPKM+1)"}\NormalTok{, }
+  \DataTypeTok{col =}\NormalTok{ colors)}
+\KeywordTok{abline}\NormalTok{(}\DataTypeTok{h =} \KeywordTok{median}\NormalTok{(}\KeywordTok{log2}\NormalTok{(rpkm }\OperatorTok{+}\StringTok{ }\DecValTok{1}\NormalTok{)), }\DataTypeTok{col =} \StringTok{"blue"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics[width=0.65\linewidth]{bookdown-demo_files/figure-latex/normDistrib-3} \end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\KeywordTok{boxplot}\NormalTok{(}\KeywordTok{log2}\NormalTok{(tpm }\OperatorTok{+}\StringTok{ }\DecValTok{1}\NormalTok{), }\DataTypeTok{notch =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{main =} \StringTok{"log2(TPM+1)"}\NormalTok{, }\DataTypeTok{col =}\NormalTok{ colors)}
+\KeywordTok{abline}\NormalTok{(}\DataTypeTok{h =} \KeywordTok{median}\NormalTok{(}\KeywordTok{log2}\NormalTok{(tpm }\OperatorTok{+}\StringTok{ }\DecValTok{1}\NormalTok{)), }\DataTypeTok{col =} \StringTok{"blue"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics[width=0.65\linewidth]{bookdown-demo_files/figure-latex/normDistrib-4} \end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\KeywordTok{boxplot}\NormalTok{(}\KeywordTok{log2}\NormalTok{(quantGC }\OperatorTok{+}\StringTok{ }\DecValTok{1}\NormalTok{), }\DataTypeTok{notch =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{main =} \StringTok{"log2(quantGC+1)"}\NormalTok{, }
+  \DataTypeTok{col =}\NormalTok{ colors)}
+\KeywordTok{abline}\NormalTok{(}\DataTypeTok{h =} \KeywordTok{median}\NormalTok{(}\KeywordTok{log2}\NormalTok{(quantGC }\OperatorTok{+}\StringTok{ }\DecValTok{1}\NormalTok{)), }\DataTypeTok{col =} \StringTok{"blue"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics[width=0.65\linewidth]{bookdown-demo_files/figure-latex/normDistrib-5} \end{center}
+
+\hypertarget{initial-data-exploration}{%
+\subsection{Initial Data Exploration}\label{initial-data-exploration}}
+
+Now the counts are normalized and we know what we are dealing with, we can start to understand how the samples are similar/dissimilar based on the quantified gene expression profiles of the genes.
+We would expect that biological/technical replicates will cluster together.
+This can be computed with different unsupervised clustering methods (e.g.~hierarchical clustering) or with dimensionality reductions methods (e.g.~Principal Component Analysis)
+
+Let's start:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# First let's make a matric with log2 scaled data.}
+\NormalTok{mat <-}\StringTok{ }\KeywordTok{log2}\NormalTok{(cpm }\OperatorTok{+}\StringTok{ }\DecValTok{1}\NormalTok{)}
+
+\CommentTok{# Calculate the variance for each gene This will detect the}
+\CommentTok{# most variables genes}
+\NormalTok{variance <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(mat, }\DecValTok{1}\NormalTok{, var)}
+
+\CommentTok{# Let's sort them and select the top 100 genes.}
+\NormalTok{selgene <-}\StringTok{ }\KeywordTok{names}\NormalTok{(variance[}\KeywordTok{order}\NormalTok{(variance, }\DataTypeTok{decreasing =}\NormalTok{ T)][}\DecValTok{1}\OperatorTok{:}\DecValTok{100}\NormalTok{])}
+
+\CommentTok{# Let's now calculate the Principal Components for the top}
+\CommentTok{# 100 genes}
+\NormalTok{pca_cpm <-}\StringTok{ }\KeywordTok{prcomp}\NormalTok{(}\KeywordTok{t}\NormalTok{(mat[selgene, ]))}
+
+\CommentTok{# Print the summary of the pcas}
+\KeywordTok{summary}\NormalTok{(pca_cpm)}
+\CommentTok{## Importance of components:}
+\CommentTok{##                          PC1   PC2   PC3    PC4     PC5}
+\CommentTok{## Standard deviation     16.66 9.494 7.416 2.6041 1.85325}
+\CommentTok{## Proportion of Variance  0.61 0.198 0.121 0.0149 0.00754}
+\CommentTok{## Cumulative Proportion   0.61 0.808 0.929 0.9434 0.95096}
+\CommentTok{##                            PC6     PC7     PC8     PC9}
+\CommentTok{## Standard deviation     1.69094 1.57609 1.52093 1.48110}
+\CommentTok{## Proportion of Variance 0.00628 0.00546 0.00508 0.00482}
+\CommentTok{## Cumulative Proportion  0.95724 0.96270 0.96778 0.97259}
+\CommentTok{##                           PC10   PC11    PC12    PC13}
+\CommentTok{## Standard deviation     1.30788 1.2250 1.14155 1.07289}
+\CommentTok{## Proportion of Variance 0.00376 0.0033 0.00286 0.00253}
+\CommentTok{## Cumulative Proportion  0.97635 0.9796 0.98251 0.98503}
+\CommentTok{##                           PC14    PC15    PC16    PC17}
+\CommentTok{## Standard deviation     0.96525 0.91623 0.86372 0.80614}
+\CommentTok{## Proportion of Variance 0.00205 0.00184 0.00164 0.00143}
+\CommentTok{## Cumulative Proportion  0.98708 0.98892 0.99056 0.99199}
+\CommentTok{##                          PC18   PC19    PC20    PC21}
+\CommentTok{## Standard deviation     0.7399 0.7074 0.63831 0.63085}
+\CommentTok{## Proportion of Variance 0.0012 0.0011 0.00089 0.00087}
+\CommentTok{## Cumulative Proportion  0.9932 0.9943 0.99519 0.99606}
+\CommentTok{##                           PC22    PC23   PC24   PC25}
+\CommentTok{## Standard deviation     0.58808 0.54664 0.5226 0.4790}
+\CommentTok{## Proportion of Variance 0.00076 0.00066 0.0006 0.0005}
+\CommentTok{## Cumulative Proportion  0.99682 0.99747 0.9981 0.9986}
+\CommentTok{##                           PC26    PC27    PC28    PC29}
+\CommentTok{## Standard deviation     0.46119 0.43126 0.37833 0.32475}
+\CommentTok{## Proportion of Variance 0.00047 0.00041 0.00031 0.00023}
+\CommentTok{## Cumulative Proportion  0.99905 0.99945 0.99977 1.00000}
+\CommentTok{##                           PC30}
+\CommentTok{## Standard deviation     7.4e-15}
+\CommentTok{## Proportion of Variance 0.0e+00}
+\CommentTok{## Cumulative Proportion  1.0e+00}
+
+\CommentTok{# Let's have a look which PCA explain more variance}
+\KeywordTok{screeplot}\NormalTok{(pca_cpm, }\DataTypeTok{npcs =} \DecValTok{15}\NormalTok{, }\DataTypeTok{type =} \StringTok{"barplot"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics[width=0.65\linewidth]{bookdown-demo_files/figure-latex/pcas-1} \end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{# Now let's create a data frame with the PCAs and the values}
+\CommentTok{# for coloring}
+\NormalTok{PCi <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(pca_cpm}\OperatorTok{$}\NormalTok{x, }\DataTypeTok{Species =}\NormalTok{ demo}\OperatorTok{$}\NormalTok{Species)}
+
+\CommentTok{# Let's calcualte the variance explained by the each}
+\CommentTok{# components}
+\NormalTok{eig <-}\StringTok{ }\NormalTok{(pca_cpm}\OperatorTok{$}\NormalTok{sdev)}\OperatorTok{^}\DecValTok{2}
+\NormalTok{variance <-}\StringTok{ }\NormalTok{eig }\OperatorTok{*}\StringTok{ }\DecValTok{100}\OperatorTok{/}\KeywordTok{sum}\NormalTok{(eig)}
+
+\CommentTok{# Now plot the PCA}
+\KeywordTok{ggscatter}\NormalTok{(PCi, }\DataTypeTok{x =} \StringTok{"PC1"}\NormalTok{, }\DataTypeTok{y =} \StringTok{"PC2"}\NormalTok{, }\DataTypeTok{color =} \StringTok{"Species"}\NormalTok{, }\DataTypeTok{palette =} \KeywordTok{c}\NormalTok{(}\StringTok{"red"}\NormalTok{, }
+  \StringTok{"grey60"}\NormalTok{, }\StringTok{"green"}\NormalTok{), }\DataTypeTok{shape =} \DecValTok{21}\NormalTok{, }\DataTypeTok{size =} \DecValTok{3}\NormalTok{, }\DataTypeTok{ellipse =} \OtherTok{TRUE}\NormalTok{, }
+  \DataTypeTok{mean.point =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{star.plot =} \OtherTok{TRUE}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{xlab}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"PC1 ("}\NormalTok{, }
+  \KeywordTok{round}\NormalTok{(variance[}\DecValTok{1}\NormalTok{], }\DecValTok{1}\NormalTok{), }\StringTok{"% )"}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{ylab}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"PC2 ("}\NormalTok{, }\KeywordTok{round}\NormalTok{(variance[}\DecValTok{2}\NormalTok{], }
+  \DecValTok{1}\NormalTok{), }\StringTok{"% )"}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_classic}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics[width=0.65\linewidth]{bookdown-demo_files/figure-latex/pcas-2} \end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{# Now let's make a dendrogram based on hirachical clustering}
+\NormalTok{hc <-}\StringTok{ }\KeywordTok{hclust}\NormalTok{(}\KeywordTok{dist}\NormalTok{(}\KeywordTok{t}\NormalTok{(mat[selgene, ])), }\StringTok{"ave"}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(hc, }\DataTypeTok{hang =} \DecValTok{-1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics[width=0.65\linewidth]{bookdown-demo_files/figure-latex/pcas-3} \end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{# Another way with correlation}
+\NormalTok{correlation_mat <-}\StringTok{ }\KeywordTok{cor}\NormalTok{(mat[selgene, ], }\DataTypeTok{method =} \StringTok{"pearson"}\NormalTok{)}
+\KeywordTok{pheatmap}\NormalTok{(correlation_mat, }\DataTypeTok{annotation_col =}\NormalTok{ demo, }\DataTypeTok{scale =} \StringTok{"row"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics[width=0.65\linewidth]{bookdown-demo_files/figure-latex/pcas-4} \end{center}
+
+\hypertarget{variance-explained-by-covariates}{%
+\subsection{Variance explained by covariates}\label{variance-explained-by-covariates}}
+
+Now the big question: how much of the gene expression is explained by the biological/technical covaraites?
+The covaraites can introduces systematic shifts in the downstream analysis and a good quality check is indeed to evaluate the variance that is explained by each of these covariates.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Re-check the demographic data}
+\KeywordTok{head}\NormalTok{(demo)}
+\CommentTok{##        Species Sex Age RIN Hemisphere PMI}
+\CommentTok{## Hsap_1    Hsap   M  42 9.8          L  13}
+\CommentTok{## Hsap_2    Hsap   M  39 6.4          L  11}
+\CommentTok{## Hsap_3    Hsap   F  25 8.8          R  18}
+\CommentTok{## Hsap_4    Hsap   F  21 7.9          L   6}
+\CommentTok{## Hsap_5    Hsap   M  45 6.6          L  16}
+\CommentTok{## Hsap_6    Hsap   M  25 5.8          R   5}
+
+\CommentTok{# Now let's calcualte the PCA for all the data (not just the}
+\CommentTok{# top variant genes)}
+\NormalTok{pca_all <-}\StringTok{ }\KeywordTok{prcomp}\NormalTok{(}\KeywordTok{t}\NormalTok{(}\KeywordTok{log2}\NormalTok{(cpm }\OperatorTok{+}\StringTok{ }\DecValTok{1}\NormalTok{)))}
+
+\CommentTok{# Let's make a temporary demographic without the species}
+\NormalTok{tmp_demo <-}\StringTok{ }\NormalTok{demo[}\KeywordTok{c}\NormalTok{(}\OperatorTok{-}\DecValTok{1}\NormalTok{)]}
+
+\CommentTok{# Let's include the first PC into the demo file.  This is the}
+\CommentTok{# one that explain most of the variance in the data.}
+\NormalTok{tmp_demo}\OperatorTok{$}\NormalTok{pca1 <-}\StringTok{ }\NormalTok{pca_all}\OperatorTok{$}\NormalTok{x[, }\DecValTok{1}\NormalTok{]}
+
+\CommentTok{# Make a model matrix for the model}
+\NormalTok{mm <-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{model.matrix}\NormalTok{(}\OperatorTok{~}\NormalTok{., tmp_demo))}
+
+\CommentTok{# Now we are going to fit a moodel between the first}
+\CommentTok{# component and the other covaraites}
+\NormalTok{fit1 =}\StringTok{ }\KeywordTok{lm}\NormalTok{(pca1 }\OperatorTok{~}\StringTok{ }\NormalTok{., }\DataTypeTok{data =}\NormalTok{ mm)}
+
+\CommentTok{# Let's transform the fit into a dataframe with}
+\CommentTok{# library(broom)}
+\NormalTok{df <-}\StringTok{ }\KeywordTok{tidy}\NormalTok{(fit1)[}\OperatorTok{-}\DecValTok{1}\NormalTok{, ]}
+
+\CommentTok{# Let's check the info reported}
+\KeywordTok{head}\NormalTok{(df)}
+\CommentTok{## # A tibble: 5 x 5}
+\CommentTok{##   term        estimate std.error statistic p.value}
+\CommentTok{##   <chr>          <dbl>     <dbl>     <dbl>   <dbl>}
+\CommentTok{## 1 SexM          -42.8      24.3     -1.76   0.0904}
+\CommentTok{## 2 Age             1.38      1.45     0.949  0.352 }
+\CommentTok{## 3 RIN             1.95      8.40     0.233  0.818 }
+\CommentTok{## 4 HemisphereR    18.3      21.3      0.858  0.400 }
+\CommentTok{## 5 PMI            -2.40      2.35    -1.02   0.317}
+
+\CommentTok{# The Pvalue reflect how much the covariates are associated}
+\CommentTok{# with the first component.  Transform the p-value into a}
+\CommentTok{# log10 scale.}
+\NormalTok{df}\OperatorTok{$}\NormalTok{log10 =}\StringTok{ }\OperatorTok{-}\KeywordTok{log10}\NormalTok{(df}\OperatorTok{$}\NormalTok{p.value)}
+
+\CommentTok{# Let's visualize the association based on this modeling}
+\KeywordTok{ggbarplot}\NormalTok{(df, }\DataTypeTok{x =} \StringTok{"term"}\NormalTok{, }\DataTypeTok{y =} \StringTok{"log10"}\NormalTok{, }\DataTypeTok{fill =} \StringTok{"white"}\NormalTok{, }\DataTypeTok{color =} \StringTok{"blue"}\NormalTok{, }
+  \DataTypeTok{x.text.angle =} \DecValTok{90}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{"-log10(P)"}\NormalTok{, }\DataTypeTok{xlab =} \StringTok{"Covariates"}\NormalTok{, }
+  \DataTypeTok{rotate =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{ggtheme =} \KeywordTok{theme_classic}\NormalTok{()) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_hline}\NormalTok{(}\DataTypeTok{yintercept =} \FloatTok{1.3}\NormalTok{, }
+  \DataTypeTok{linetype =} \StringTok{"dotted"}\NormalTok{, }\DataTypeTok{color =} \StringTok{"red"}\NormalTok{, }\DataTypeTok{size =} \DecValTok{1}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{ylim}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{5}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{ggtitle}\NormalTok{(}\StringTok{"PCA1 vs Covariates"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics[width=0.65\linewidth]{bookdown-demo_files/figure-latex/covaraites-1} \end{center}
+
+\hypertarget{save-the-data}{%
+\subsection{Save the data}\label{save-the-data}}
+
+Now it's time to save all the data we generated.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\KeywordTok{save}\NormalTok{(exp, cpm, rpkm, tpm, quantGC, demo, }\DataTypeTok{file =} \StringTok{"peb_data/Normalized_data.RData"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{exercise-for-data-exploration-chapter}{%
+\subsection{Exercise for Data Exploration chapter}\label{exercise-for-data-exploration-chapter}}
+
+\begin{itemize}
+\item
+  Do data exploration for RPKM.
+\item
+  Do data exploration for TPM
+\item
+  Do data exploration for quantGC.
+\item
+  Covaraite association with different normalized values.
+\end{itemize}
+
+\hypertarget{DiffExpAnalysis}{%
+\chapter{Differential Expression Analysis}\label{DiffExpAnalysis}}
+
+Differential expression analysis allows to test tens of thousands of hypotheses (one test for each gene) against the null hypothesis that the gene expression is the same between two or multiple species.
+Some limiting factors: sample size, non-normally distribution of counts, high/low expressed genes.
+Therefore, to apply any statistics, it is necessary to check the data first and apply the right modeling.
+However, some tools such as DESeq2 address these limitations using statistical models in order to maximize the amount of knowledge that can be extracted from such noisy datasets.
+
+In this chapter we will apply:
+
+\begin{itemize}
+\item
+  \textbf{Linear Model}
+\item
+  \textbf{DESeq2}
+\end{itemize}
+
+We will also use \textbf{Surrogates Variables (sva)}, a method used to detect sources of unwanted variation in high throughput sequencing.
+
+We will then identify species specific differentially expressed genes which will be input for the functional/visualization chapter.
+
+\hypertarget{data-loading-1}{%
+\section{Data loading}\label{data-loading-1}}
+
+\textbf{So let's start!}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{# First load the libraries we will use in this section}
+\KeywordTok{suppressPackageStartupMessages}\NormalTok{(}\KeywordTok{library}\NormalTok{(sva))}
+\KeywordTok{suppressPackageStartupMessages}\NormalTok{(}\KeywordTok{library}\NormalTok{(DESeq2))}
+\KeywordTok{suppressPackageStartupMessages}\NormalTok{(}\KeywordTok{library}\NormalTok{(tidyverse))}
+\KeywordTok{suppressPackageStartupMessages}\NormalTok{(}\KeywordTok{library}\NormalTok{(openxlsx))}
+\KeywordTok{suppressPackageStartupMessages}\NormalTok{(}\KeywordTok{library}\NormalTok{(ggplot2))}
+\KeywordTok{suppressPackageStartupMessages}\NormalTok{(}\KeywordTok{library}\NormalTok{(ggpubr))}
+\KeywordTok{suppressPackageStartupMessages}\NormalTok{(}\KeywordTok{library}\NormalTok{(pheatmap))}
+\KeywordTok{suppressPackageStartupMessages}\NormalTok{(}\KeywordTok{library}\NormalTok{(here))}
+\KeywordTok{suppressPackageStartupMessages}\NormalTok{(}\KeywordTok{library}\NormalTok{(future.apply))}
+\KeywordTok{suppressPackageStartupMessages}\NormalTok{(}\KeywordTok{library}\NormalTok{(broom))}
+\KeywordTok{suppressPackageStartupMessages}\NormalTok{(}\KeywordTok{library}\NormalTok{(ggrepel))}
+\KeywordTok{suppressPackageStartupMessages}\NormalTok{(}\KeywordTok{library}\NormalTok{(DT))}
+\KeywordTok{suppressPackageStartupMessages}\NormalTok{(}\KeywordTok{library}\NormalTok{(clusterProfiler))}
+\KeywordTok{suppressPackageStartupMessages}\NormalTok{(}\KeywordTok{library}\NormalTok{(org.Hs.eg.db))}
+
+\CommentTok{# Multicore activated}
+\KeywordTok{plan}\NormalTok{(multiprocess)}
+
+\CommentTok{# the data is stored under the subdirectory 'data'}
+\KeywordTok{list.files}\NormalTok{()}
+\CommentTok{##  [1] "_book"                  "_bookdown_files"       }
+\CommentTok{##  [3] "_bookdown.yml"          "_build.sh"             }
+\CommentTok{##  [5] "_deploy.sh"             "_output.yml"           }
+\CommentTok{##  [7] "01-introPipes.Rmd"      "02-DataExploration.Rmd"}
+\CommentTok{##  [9] "03-DiffExpAnalysis.Rmd" "addson"                }
+\CommentTok{## [11] "book.bib"               "bookdown-demo_cache"   }
+\CommentTok{## [13] "bookdown-demo_files"    "bookdown-demo.Rmd"     }
+\CommentTok{## [15] "bookdown-demo.Rproj"    "DESCRIPTION"           }
+\CommentTok{## [17] "Dockerfile"             "images"                }
+\CommentTok{## [19] "index.Rmd"              "LICENSE"               }
+\CommentTok{## [21] "now.json"               "packages.bib"          }
+\CommentTok{## [23] "peb_data"               "preamble.tex"          }
+\CommentTok{## [25] "README.md"              "style.css"             }
+\CommentTok{## [27] "toc.css"}
+
+\CommentTok{# Remove previous loads}
+\KeywordTok{rm}\NormalTok{(}\DataTypeTok{list =} \KeywordTok{ls}\NormalTok{())}
+
+\CommentTok{# Create a directory where to save the data}
+\KeywordTok{dir.create}\NormalTok{(}\StringTok{"peb_data/output/"}\NormalTok{)}
+
+\CommentTok{# load the data you need}
+\KeywordTok{load}\NormalTok{(}\KeywordTok{here}\NormalTok{(}\StringTok{"peb_data"}\NormalTok{, }\StringTok{"Normalized_data.RData"}\NormalTok{))}
+
+\CommentTok{# Check what data you loaded}
+\KeywordTok{ls}\NormalTok{()}
+\CommentTok{## [1] "cpm"     "demo"    "exp"     "quantGC" "rpkm"   }
+\CommentTok{## [6] "tpm"}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{dge-based-on-linear-model}{%
+\section{DGE based on linear model}\label{dge-based-on-linear-model}}
+
+We are going to define changes in gene expression between all the three species.
+We will then apply a parsimony approach to define species-specific changes.
+Here a representation:
+
+Let's start!
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{# Filter the demographic for human-chimpanzee}
+\NormalTok{demoHC <-}\StringTok{ }\NormalTok{demo }\OperatorTok{%>%}\StringTok{ }\KeywordTok{rownames_to_column}\NormalTok{(}\StringTok{"ID"}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{filter}\NormalTok{(Species }\OperatorTok{%in%}\StringTok{ }
+\StringTok{  }\KeywordTok{c}\NormalTok{(}\StringTok{"Hsap"}\NormalTok{, }\StringTok{"PanTro"}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{column_to_rownames}\NormalTok{(}\StringTok{"ID"}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{droplevels}\NormalTok{()  }\CommentTok{# Remove unwanted factors}
+
+\CommentTok{# First remove the genes with 0s.}
+\NormalTok{logCPM <-}\StringTok{ }\KeywordTok{log2}\NormalTok{(cpm }\OperatorTok{+}\StringTok{ }\DecValTok{1}\NormalTok{)}
+
+\CommentTok{# we need to filter the low expressed genes.  Here we are}
+\CommentTok{# going to use a fitler where all the samples express the}
+\CommentTok{# gene > 0.5}
+\NormalTok{perc <-}\StringTok{ }\DecValTok{100}
+\NormalTok{vec =}\StringTok{ }\KeywordTok{round}\NormalTok{((}\KeywordTok{ncol}\NormalTok{(logCPM) }\OperatorTok{*}\StringTok{ }\NormalTok{perc)}\OperatorTok{/}\DecValTok{100}\NormalTok{)}
+\NormalTok{notAllZero =}\StringTok{ }\NormalTok{(}\KeywordTok{rowSums}\NormalTok{(logCPM }\OperatorTok{>}\StringTok{ }\DecValTok{0}\NormalTok{) }\OperatorTok{>=}\StringTok{ }\NormalTok{vec)}
+\NormalTok{logCPM_filtered =}\StringTok{ }\NormalTok{logCPM[notAllZero, ]}
+
+\CommentTok{# you can also use a different percentage and/or a}
+\CommentTok{# conditional filtering Not to run filter=apply(logCPM, 1,}
+\CommentTok{# function(x) (all(x[grep('Hsap',names(x))] > 0) |}
+\CommentTok{# all(x[grep('PanTro',names(x))] > 0)) |}
+\CommentTok{# all(x[grep('RheMac',names(x))] > 0)) logCPM_filtered <-}
+\CommentTok{# logCPM[filter,]}
+
+\CommentTok{# Now for the cpm and log2 transform to make the data}
+\CommentTok{# normally distributed fetching Human and Chimp sample}
+
+\NormalTok{logCPM_HC <-}\StringTok{ }\NormalTok{logCPM_filtered[, }\KeywordTok{grep}\NormalTok{(}\StringTok{"Hsap|PanTro"}\NormalTok{, }\KeywordTok{colnames}\NormalTok{(logCPM_filtered))]}
+
+\CommentTok{# Now we can start to plan the linear modeling for the}
+\CommentTok{# analysis!  The model you wanna fit with all the covariates.}
+\NormalTok{model <-}\StringTok{ "GeneExpr ~ Species + Age + Sex + Hemisphere + PMI + RIN"}
+
+\CommentTok{# Create a temporary metadata}
+\NormalTok{tmpDemo <-}\StringTok{ }\NormalTok{demoHC}
+
+\CommentTok{# Function for fitting the model.}
+\NormalTok{fit_lm <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(vectorizedExpression) \{}
+\NormalTok{  tmpMetaData <-}\StringTok{ }\KeywordTok{cbind}\NormalTok{(tmpDemo, }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{GeneExpr =} \KeywordTok{unname}\NormalTok{(vectorizedExpression)))}
+\NormalTok{  residuals <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(model, }\DataTypeTok{data =}\NormalTok{ tmpMetaData)}
+\NormalTok{  pval <-}\StringTok{ }\KeywordTok{as.numeric}\NormalTok{(}\KeywordTok{tidy}\NormalTok{(residuals)}\OperatorTok{$}\NormalTok{p.value[}\DecValTok{2}\NormalTok{])}
+\NormalTok{  effect_size <-}\StringTok{ }\KeywordTok{as.numeric}\NormalTok{(}\KeywordTok{tidy}\NormalTok{(residuals)}\OperatorTok{$}\NormalTok{estimate[}\DecValTok{2}\NormalTok{])}
+  \KeywordTok{c}\NormalTok{(}\DataTypeTok{EffSize_LM =}\NormalTok{ effect_size, }\DataTypeTok{Pval_LM =}\NormalTok{ pval)}
+\NormalTok{\}}
+
+\NormalTok{fit_the_mod <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(vectorizedExpression) \{}
+  \KeywordTok{tryCatch}\NormalTok{(}\KeywordTok{fit_lm}\NormalTok{(vectorizedExpression), }\DataTypeTok{error =} \ControlFlowTok{function}\NormalTok{(e) }\KeywordTok{c}\NormalTok{(}\DataTypeTok{EffSize_LM =} \OtherTok{NA}\NormalTok{, }
+    \DataTypeTok{Pval_LM =} \OtherTok{NA}\NormalTok{))}
+\NormalTok{\}}
+
+\CommentTok{# Run the analysis and get the stats}
+\NormalTok{hc_stat <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(logCPM_HC, }\DecValTok{1}\NormalTok{, fit_the_mod) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{t}\NormalTok{() }\OperatorTok{%>%}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{() }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{rownames_to_column}\NormalTok{(}\StringTok{"Gene"}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# Adjust the p-value by FDR}
+\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{FDR_LM =} \KeywordTok{p.adjust}\NormalTok{(Pval_LM, }\DataTypeTok{method =} \StringTok{"BH"}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }\CommentTok{# Relabel}
+\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{rename}\NormalTok{(}\DataTypeTok{EffSize_HC =}\NormalTok{ EffSize_LM, }\DataTypeTok{Pval_HC =}\NormalTok{ Pval_LM, }\DataTypeTok{FDR_HC =}\NormalTok{ FDR_LM) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\CommentTok{# Switch sign}
+\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{EffSize_HC =} \DecValTok{-1} \OperatorTok{*}\StringTok{ }\NormalTok{EffSize_HC)}
+
+\CommentTok{# Have a look to the data! head(hc_stat)}
+\NormalTok{DT}\OperatorTok{::}\KeywordTok{datatable}\NormalTok{(hc_stat, }\DataTypeTok{options =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{pageLength =} \DecValTok{10}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{htmlwidget-4e1770d66a86dcce9699}{}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{# Now let's apply the same model for the other two}
+\CommentTok{# comparisons (H vs R, C vs R)}
+
+\CommentTok{# Demo for HR}
+\NormalTok{demoHR <-}\StringTok{ }\NormalTok{demo }\OperatorTok{%>%}\StringTok{ }\KeywordTok{rownames_to_column}\NormalTok{(}\StringTok{"ID"}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{filter}\NormalTok{(Species }\OperatorTok{%in%}\StringTok{ }
+\StringTok{  }\KeywordTok{c}\NormalTok{(}\StringTok{"Hsap"}\NormalTok{, }\StringTok{"RheMac"}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{column_to_rownames}\NormalTok{(}\StringTok{"ID"}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{droplevels}\NormalTok{()}
+
+\CommentTok{# Demo for CR}
+\NormalTok{demoCR <-}\StringTok{ }\NormalTok{demo }\OperatorTok{%>%}\StringTok{ }\KeywordTok{rownames_to_column}\NormalTok{(}\StringTok{"ID"}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{filter}\NormalTok{(Species }\OperatorTok{%in%}\StringTok{ }
+\StringTok{  }\KeywordTok{c}\NormalTok{(}\StringTok{"PanTro"}\NormalTok{, }\StringTok{"RheMac"}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{column_to_rownames}\NormalTok{(}\StringTok{"ID"}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{droplevels}\NormalTok{()}
+
+\CommentTok{# Get the gene expression for HR and CR}
+\NormalTok{logCPM_HR <-}\StringTok{ }\NormalTok{logCPM_filtered[, }\KeywordTok{grep}\NormalTok{(}\StringTok{"Hsap|RheMac"}\NormalTok{, }\KeywordTok{colnames}\NormalTok{(logCPM_filtered))]}
+\NormalTok{logCPM_CR <-}\StringTok{ }\NormalTok{logCPM_filtered[, }\KeywordTok{grep}\NormalTok{(}\StringTok{"PanTro|RheMac"}\NormalTok{, }\KeywordTok{colnames}\NormalTok{(logCPM_filtered))]}
+
+\CommentTok{# Run the modeling HR}
+\NormalTok{tmpDemo <-}\StringTok{ }\NormalTok{demoHR}
+
+\NormalTok{hr_stat <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(logCPM_HR, }\DecValTok{1}\NormalTok{, fit_the_mod) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{t}\NormalTok{() }\OperatorTok{%>%}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{() }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{rownames_to_column}\NormalTok{(}\StringTok{"Gene"}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{FDR_LM =} \KeywordTok{p.adjust}\NormalTok{(Pval_LM, }
+  \DataTypeTok{method =} \StringTok{"BH"}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{rename}\NormalTok{(}\DataTypeTok{EffSize_HR =}\NormalTok{ EffSize_LM, }
+  \DataTypeTok{Pval_HR =}\NormalTok{ Pval_LM, }\DataTypeTok{FDR_HR =}\NormalTok{ FDR_LM) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{EffSize_HR =} \DecValTok{-1} \OperatorTok{*}\StringTok{ }
+\StringTok{  }\NormalTok{EffSize_HR)  }\CommentTok{# Switch sign}
+
+\CommentTok{# have a look to the data just created}
+\NormalTok{DT}\OperatorTok{::}\KeywordTok{datatable}\NormalTok{(hr_stat, }\DataTypeTok{options =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{pageLength =} \DecValTok{10}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{htmlwidget-65edfe9f869aa904450f}{}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{# Run the modeling PR}
+\NormalTok{tmpDemo <-}\StringTok{ }\NormalTok{demoCR}
+
+\NormalTok{cr_stat <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(logCPM_CR, }\DecValTok{1}\NormalTok{, fit_the_mod) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{t}\NormalTok{() }\OperatorTok{%>%}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{() }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{rownames_to_column}\NormalTok{(}\StringTok{"Gene"}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{FDR_LM =} \KeywordTok{p.adjust}\NormalTok{(Pval_LM, }
+  \DataTypeTok{method =} \StringTok{"BH"}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{rename}\NormalTok{(}\DataTypeTok{EffSize_CR =}\NormalTok{ EffSize_LM, }
+  \DataTypeTok{Pval_CR =}\NormalTok{ Pval_LM, }\DataTypeTok{FDR_CR =}\NormalTok{ FDR_LM) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{EffSize_CR =} \DecValTok{-1} \OperatorTok{*}\StringTok{ }
+\StringTok{  }\NormalTok{EffSize_CR)  }\CommentTok{# Switch sign}
+
+\CommentTok{# have a look to the data just created}
+\NormalTok{DT}\OperatorTok{::}\KeywordTok{datatable}\NormalTok{(cr_stat, }\DataTypeTok{options =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{pageLength =} \DecValTok{10}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{htmlwidget-171f14364aa3ebedfbfc}{}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{# Now it's time to combine all the data together and save the}
+\CommentTok{# files}
+\NormalTok{HCR_stat <-}\StringTok{ }\KeywordTok{Reduce}\NormalTok{(dplyr}\OperatorTok{::}\NormalTok{full_join, }\KeywordTok{list}\NormalTok{(hc_stat, hr_stat, cr_stat))}
+
+\NormalTok{openxlsx}\OperatorTok{::}\KeywordTok{write.xlsx}\NormalTok{(HCR_stat, }\DataTypeTok{file =} \StringTok{"peb_data/output/HCR_stat.xlsx"}\NormalTok{, }
+  \DataTypeTok{colNames =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{borders =} \StringTok{"columns"}\NormalTok{, }\DataTypeTok{sheetName =} \StringTok{"Full Table"}\NormalTok{)}
+
+\KeywordTok{save}\NormalTok{(hc_stat, hr_stat, cr_stat, HCR_stat, }\DataTypeTok{file =} \StringTok{"peb_data/output/Linear_Modeling_Statistics.RData"}\NormalTok{)}
+
+\CommentTok{# have a look to the data just created}
+\NormalTok{DT}\OperatorTok{::}\KeywordTok{datatable}\NormalTok{(HCR_stat, }\DataTypeTok{options =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{pageLength =} \DecValTok{10}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{htmlwidget-52d82635d988c6e12f4c}{}
+
+\hypertarget{species-specific-dge}{%
+\section{Species Specific DGE}\label{species-specific-dge}}
+
+Now it's time to apply the parsimony to define the species-specific differentially expressed genes. This is based on adjusted p.value and also direction of the gene.
+For instance, As in the picture, the genes should be differentially expressed in H vs C, H vs C but not in C vs R. We expect that also the fold change (effect size) will have the same direction in H vs C and H vs R.
+
+Let's start!
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{# Let's have another look to the input data}
+\KeywordTok{head}\NormalTok{(HCR_stat)}
+\CommentTok{##    Gene EffSize_HC Pval_HC FDR_HC EffSize_HR   Pval_HR}
+\CommentTok{## 1  AAAS    0.08334  0.8923 0.9618   -0.09687 8.146e-01}
+\CommentTok{## 2  AACS   -0.18288  0.6488 0.8625   -0.55786 1.746e-01}
+\CommentTok{## 3 AADAT   -0.45706  0.2017 0.5443   -1.03622 1.086e-03}
+\CommentTok{## 4  AAK1    0.02924  0.7759 0.9152   -0.37570 3.593e-05}
+\CommentTok{## 5  AAMP   -0.32675  0.6377 0.8577   -0.66929 2.743e-01}
+\CommentTok{## 6 AANAT    0.34394  0.2938 0.6386   -0.64980 1.374e-01}
+\CommentTok{##      FDR_HR EffSize_CR   Pval_CR   FDR_CR}
+\CommentTok{## 1 0.8713298    -0.2380 6.944e-01 0.827769}
+\CommentTok{## 2 0.3004664    -0.4988 3.094e-01 0.535762}
+\CommentTok{## 3 0.0083901    -1.1605 1.813e-02 0.090267}
+\CommentTok{## 4 0.0007026    -0.3745 6.045e-05 0.001625}
+\CommentTok{## 5 0.4118502    -0.7806 2.000e-01 0.418384}
+\CommentTok{## 6 0.2534909    -0.2207 6.361e-01 0.788821}
+
+\CommentTok{# We are going to define the species specific genes now.  We}
+\CommentTok{# are going to filter for FDRs and same direction of the}
+\CommentTok{# effect sizes.}
+
+\CommentTok{# Human first!}
+\NormalTok{Hsap_Spec <-}\StringTok{ }\NormalTok{HCR_stat }\OperatorTok{%>%}\StringTok{ }\KeywordTok{filter}\NormalTok{(FDR_HC }\OperatorTok{<}\StringTok{ }\FloatTok{0.05}\NormalTok{, FDR_HR }\OperatorTok{<}\StringTok{ }\FloatTok{0.05}\NormalTok{, }
+\NormalTok{  FDR_CR }\OperatorTok{>}\StringTok{ }\FloatTok{0.1}\NormalTok{, }\KeywordTok{sign}\NormalTok{(EffSize_HC) }\OperatorTok{==}\StringTok{ }\KeywordTok{sign}\NormalTok{(EffSize_HR))}
+
+\CommentTok{# Let's check how many genes survived}
+\KeywordTok{dim}\NormalTok{(Hsap_Spec)}
+\CommentTok{## [1] 129  10}
+
+\NormalTok{DT}\OperatorTok{::}\KeywordTok{datatable}\NormalTok{(Hsap_Spec, }\DataTypeTok{options =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{pageLength =} \DecValTok{10}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{htmlwidget-52b7f36e26c300a71d5d}{}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+
+\CommentTok{# Now chimp specific}
+\NormalTok{PanTro_Spec <-}\StringTok{ }\NormalTok{HCR_stat }\OperatorTok{%>%}\StringTok{ }\KeywordTok{filter}\NormalTok{(FDR_HC }\OperatorTok{<}\StringTok{ }\FloatTok{0.05}\NormalTok{, FDR_HR }\OperatorTok{>}\StringTok{ }\FloatTok{0.1}\NormalTok{, }
+\NormalTok{  FDR_CR }\OperatorTok{<}\StringTok{ }\FloatTok{0.05}\NormalTok{, }\KeywordTok{sign}\NormalTok{(}\OperatorTok{-}\DecValTok{1} \OperatorTok{*}\StringTok{ }\NormalTok{EffSize_HC) }\OperatorTok{==}\StringTok{ }\KeywordTok{sign}\NormalTok{(EffSize_CR))}
+
+\KeywordTok{dim}\NormalTok{(PanTro_Spec)}
+\CommentTok{## [1] 81 10}
+
+\NormalTok{DT}\OperatorTok{::}\KeywordTok{datatable}\NormalTok{(PanTro_Spec, }\DataTypeTok{options =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{pageLength =} \DecValTok{10}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{htmlwidget-f3d80f5735caaf1367c2}{}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{# Now macaque specific}
+\NormalTok{RheMac_Spec <-}\StringTok{ }\NormalTok{HCR_stat }\OperatorTok{%>%}\StringTok{ }\KeywordTok{filter}\NormalTok{(FDR_HC }\OperatorTok{>}\StringTok{ }\FloatTok{0.1}\NormalTok{, FDR_HR }\OperatorTok{<}\StringTok{ }\FloatTok{0.05}\NormalTok{, }
+\NormalTok{  FDR_CR }\OperatorTok{<}\StringTok{ }\FloatTok{0.05}\NormalTok{, }\KeywordTok{sign}\NormalTok{(}\OperatorTok{-}\DecValTok{1} \OperatorTok{*}\StringTok{ }\NormalTok{EffSize_HR) }\OperatorTok{==}\StringTok{ }\KeywordTok{sign}\NormalTok{(}\OperatorTok{-}\DecValTok{1} \OperatorTok{*}\StringTok{ }\NormalTok{EffSize_CR))}
+
+\KeywordTok{dim}\NormalTok{(RheMac_Spec)}
+\CommentTok{## [1] 830  10}
+
+\NormalTok{DT}\OperatorTok{::}\KeywordTok{datatable}\NormalTok{(RheMac_Spec, }\DataTypeTok{options =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{pageLength =} \DecValTok{10}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{htmlwidget-5ca3336b15b0293a530a}{}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{# Save the data}
+\KeywordTok{save}\NormalTok{(Hsap_Spec, PanTro_Spec, RheMac_Spec, }\DataTypeTok{file =} \StringTok{"peb_data/output/Species_Specific_DGE.RData"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{surrogate-variables}{%
+\section{Surrogate Variables}\label{surrogate-variables}}
+
+Now we ara going to add surrogates variable in the analysis.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{# We need the expressed genes}
+\KeywordTok{head}\NormalTok{(logCPM_filtered)}
+\CommentTok{##       Hsap_1 Hsap_2 Hsap_3 Hsap_4 Hsap_5 Hsap_6 Hsap_7}
+\CommentTok{## AAAS  3.6938 3.1745 3.5225 3.7854 2.5814  3.540  3.829}
+\CommentTok{## AACS  6.8571 6.6629 7.0101 6.3269 6.4212  6.977  8.100}
+\CommentTok{## AADAT 4.6202 3.8461 4.5841 4.0090 4.1591  4.312  4.841}
+\CommentTok{## AAK1  8.8296 8.7640 8.8367 8.9483 8.7082  8.854  9.082}
+\CommentTok{## AAMP  2.6524 1.3886 1.6845 0.4701 1.8261  1.966  3.494}
+\CommentTok{## AANAT 0.7127 0.7524 0.1446 1.5489 0.9272  1.036  1.501}
+\CommentTok{##       Hsap_8 Hsap_9 Hsap_10 PanTro_1 PanTro_2 PanTro_3}
+\CommentTok{## AAAS  3.7221 2.4839  2.4524    4.887   2.9599    5.058}
+\CommentTok{## AACS  6.6292 6.9805  6.2730    8.362   6.7094    7.165}
+\CommentTok{## AADAT 4.2883 4.2854  4.6223    3.725   5.0173    2.417}
+\CommentTok{## AAK1  9.0357 8.7888  8.7831    8.498   8.9204    9.087}
+\CommentTok{## AAMP  2.8204 0.5206  1.6157    3.558   0.7301    1.869}
+\CommentTok{## AANAT 0.7629 0.5206  0.4266    1.518   0.1077    2.954}
+\CommentTok{##       PanTro_4 PanTro_5 PanTro_6 PanTro_7 PanTro_8 PanTro_9}
+\CommentTok{## AAAS    3.7121   2.1567    1.433    5.364   2.9164    3.365}
+\CommentTok{## AACS    6.4997   5.1855    7.389    8.036   6.4443    7.547}
+\CommentTok{## AADAT   4.4150   5.0815    2.546    4.650   4.6655    4.207}
+\CommentTok{## AAK1    8.9209   8.9417    8.660    8.692   8.7896    8.970}
+\CommentTok{## AAMP    1.1400   1.3472    1.746    3.896   1.1000    2.449}
+\CommentTok{## AANAT   0.7955   0.5184    1.033    1.572   0.5017    1.239}
+\CommentTok{##       PanTro_10 RheMac_1 RheMac_2 RheMac_3 RheMac_4}
+\CommentTok{## AAAS      4.627   3.0880    4.037   2.5314    3.119}
+\CommentTok{## AACS      7.816   6.6871    8.123   6.3658    7.759}
+\CommentTok{## AADAT     3.952   5.7265    4.968   6.1274    5.685}
+\CommentTok{## AAK1      8.799   9.3706    9.280   9.2022    9.175}
+\CommentTok{## AAMP      2.894   2.1704    4.136   1.3751    3.023}
+\CommentTok{## AANAT     1.665   0.6523    1.905   0.5546    2.780}
+\CommentTok{##       RheMac_5 RheMac_6 RheMac_7 RheMac_8 RheMac_9}
+\CommentTok{## AAAS     3.792    2.395    3.964   4.3729    4.083}
+\CommentTok{## AACS     7.893    6.730    7.690   7.2772    7.685}
+\CommentTok{## AADAT    4.446    5.261    5.527   5.3187    4.402}
+\CommentTok{## AAK1     9.192    9.246    9.252   9.2576    9.306}
+\CommentTok{## AAMP     3.281    1.399    3.517   3.3026    2.519}
+\CommentTok{## AANAT    1.424    1.102    2.106   0.6129    1.550}
+\CommentTok{##       RheMac_10}
+\CommentTok{## AAAS     2.2562}
+\CommentTok{## AACS     5.8028}
+\CommentTok{## AADAT    5.9103}
+\CommentTok{## AAK1     9.0968}
+\CommentTok{## AAMP     1.1290}
+\CommentTok{## AANAT    0.4046}
+
+\CommentTok{# Calculate the surrogate variables using SVA First we need}
+\CommentTok{# to create two model matrix, one for the fitting and one as}
+\CommentTok{# null The null model contains all the covaraites except the}
+\CommentTok{# predictor (Species)}
+
+\NormalTok{mod <-}\StringTok{ }\KeywordTok{model.matrix}\NormalTok{(}\OperatorTok{~}\NormalTok{Species }\OperatorTok{+}\StringTok{ }\NormalTok{Age }\OperatorTok{+}\StringTok{ }\NormalTok{Sex }\OperatorTok{+}\StringTok{ }\NormalTok{Hemisphere }\OperatorTok{+}\StringTok{ }\NormalTok{PMI }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\NormalTok{RIN, }\DataTypeTok{data =}\NormalTok{ demo)}
+\NormalTok{mod0 <-}\StringTok{ }\KeywordTok{model.matrix}\NormalTok{(}\OperatorTok{~}\NormalTok{Age }\OperatorTok{+}\StringTok{ }\NormalTok{Sex }\OperatorTok{+}\StringTok{ }\NormalTok{Hemisphere }\OperatorTok{+}\StringTok{ }\NormalTok{PMI }\OperatorTok{+}\StringTok{ }\NormalTok{RIN, }\DataTypeTok{data =}\NormalTok{ demo)}
+
+\CommentTok{# Create SVA object (input the gene expression) with 100}
+\CommentTok{# permuation.}
+\NormalTok{svaobj <-}\StringTok{ }\KeywordTok{sva}\NormalTok{(}\KeywordTok{as.matrix}\NormalTok{(logCPM_filtered), mod, mod0, }\DataTypeTok{n.sv =} \OtherTok{NULL}\NormalTok{, }
+  \DataTypeTok{B =} \DecValTok{100}\NormalTok{, }\DataTypeTok{method =} \StringTok{"two-step"}\NormalTok{)}
+\CommentTok{## Number of significant surrogate variables is:  3}
+
+\CommentTok{# Get the surrogates variables}
+\NormalTok{svaobj}\OperatorTok{$}\NormalTok{sv =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(svaobj}\OperatorTok{$}\NormalTok{sv)}
+\KeywordTok{colnames}\NormalTok{(svaobj}\OperatorTok{$}\NormalTok{sv) =}\StringTok{ }\KeywordTok{c}\NormalTok{(}\KeywordTok{paste0}\NormalTok{(}\StringTok{"SV"}\NormalTok{, }\KeywordTok{seq}\NormalTok{(svaobj}\OperatorTok{$}\NormalTok{n.sv)))}
+\NormalTok{metadata_sv <-}\StringTok{ }\KeywordTok{cbind}\NormalTok{(demo, svaobj}\OperatorTok{$}\NormalTok{sv)}
+
+\CommentTok{# Recreate demographics}
+\NormalTok{demoHC_sv <-}\StringTok{ }\NormalTok{metadata_sv }\OperatorTok{%>%}\StringTok{ }\KeywordTok{rownames_to_column}\NormalTok{(}\StringTok{"ID"}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{filter}\NormalTok{(Species }\OperatorTok{%in%}\StringTok{ }
+\StringTok{  }\KeywordTok{c}\NormalTok{(}\StringTok{"Hsap"}\NormalTok{, }\StringTok{"PanTro"}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{column_to_rownames}\NormalTok{(}\StringTok{"ID"}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{droplevels}\NormalTok{()}
+
+\NormalTok{demoHR_sv <-}\StringTok{ }\NormalTok{metadata_sv }\OperatorTok{%>%}\StringTok{ }\KeywordTok{rownames_to_column}\NormalTok{(}\StringTok{"ID"}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{filter}\NormalTok{(Species }\OperatorTok{%in%}\StringTok{ }
+\StringTok{  }\KeywordTok{c}\NormalTok{(}\StringTok{"Hsap"}\NormalTok{, }\StringTok{"RheMac"}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{column_to_rownames}\NormalTok{(}\StringTok{"ID"}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{droplevels}\NormalTok{()}
+
+\NormalTok{demoCR_sv <-}\StringTok{ }\NormalTok{metadata_sv }\OperatorTok{%>%}\StringTok{ }\KeywordTok{rownames_to_column}\NormalTok{(}\StringTok{"ID"}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{filter}\NormalTok{(Species }\OperatorTok{%in%}\StringTok{ }
+\StringTok{  }\KeywordTok{c}\NormalTok{(}\StringTok{"PanTro"}\NormalTok{, }\StringTok{"RheMac"}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{column_to_rownames}\NormalTok{(}\StringTok{"ID"}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{droplevels}\NormalTok{()}
+
+\CommentTok{# Let's add the SV into the model and run the analysis!}
+\NormalTok{model <-}\StringTok{ }\KeywordTok{as.formula}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"GeneExpr ~"}\NormalTok{, }\KeywordTok{paste}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\KeywordTok{colnames}\NormalTok{(demoHC_sv)), }
+  \DataTypeTok{collapse =} \StringTok{"+"}\NormalTok{)))}
+
+\NormalTok{tmpDemo <-}\StringTok{ }\NormalTok{demoHC_sv}
+
+\CommentTok{# Run the analysis and get the stats}
+\NormalTok{hc_stat_sva <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(logCPM_HC, }\DecValTok{1}\NormalTok{, fit_the_mod) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{t}\NormalTok{() }\OperatorTok{%>%}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{() }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{rownames_to_column}\NormalTok{(}\StringTok{"Gene"}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{FDR_LM =} \KeywordTok{p.adjust}\NormalTok{(Pval_LM, }
+  \DataTypeTok{method =} \StringTok{"BH"}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{rename}\NormalTok{(}\DataTypeTok{EffSize_HC =}\NormalTok{ EffSize_LM, }
+  \DataTypeTok{Pval_HC =}\NormalTok{ Pval_LM, }\DataTypeTok{FDR_HC =}\NormalTok{ FDR_LM) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{EffSize_HC =} \DecValTok{-1} \OperatorTok{*}\StringTok{ }
+\StringTok{  }\NormalTok{EffSize_HC)  }\CommentTok{# Switch sign}
+
+\CommentTok{# Now we are going to apply the same method to HvsR Now}
+\CommentTok{# create the new model including the surrogates variables.}
+\NormalTok{model <-}\StringTok{ }\KeywordTok{as.formula}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"GeneExpr ~"}\NormalTok{, }\KeywordTok{paste}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\KeywordTok{colnames}\NormalTok{(demoHR_sv)), }
+  \DataTypeTok{collapse =} \StringTok{"+"}\NormalTok{)))}
+
+\NormalTok{tmpDemo <-}\StringTok{ }\NormalTok{demoHR_sv}
+
+\NormalTok{hr_stat_sva <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(logCPM_HR, }\DecValTok{1}\NormalTok{, fit_the_mod) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{t}\NormalTok{() }\OperatorTok{%>%}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{() }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{rownames_to_column}\NormalTok{(}\StringTok{"Gene"}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{FDR_LM =} \KeywordTok{p.adjust}\NormalTok{(Pval_LM, }
+  \DataTypeTok{method =} \StringTok{"BH"}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{rename}\NormalTok{(}\DataTypeTok{EffSize_HR =}\NormalTok{ EffSize_LM, }
+  \DataTypeTok{Pval_HR =}\NormalTok{ Pval_LM, }\DataTypeTok{FDR_HR =}\NormalTok{ FDR_LM) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{EffSize_HR =} \DecValTok{-1} \OperatorTok{*}\StringTok{ }
+\StringTok{  }\NormalTok{EffSize_HR)  }\CommentTok{# Switch sign}
+
+\CommentTok{# Now we are going to apply the same method to CvsR Now}
+\CommentTok{# create the new model including the surrogates variables.}
+\NormalTok{model <-}\StringTok{ }\KeywordTok{as.formula}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"GeneExpr ~"}\NormalTok{, }\KeywordTok{paste}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\KeywordTok{colnames}\NormalTok{(demoCR_sv)), }
+  \DataTypeTok{collapse =} \StringTok{"+"}\NormalTok{)))}
+
+\NormalTok{tmpDemo <-}\StringTok{ }\NormalTok{demoCR_sv}
+
+\NormalTok{cr_stat_sva <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(logCPM_CR, }\DecValTok{1}\NormalTok{, fit_the_mod) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{t}\NormalTok{() }\OperatorTok{%>%}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{() }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{rownames_to_column}\NormalTok{(}\StringTok{"Gene"}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{FDR_LM =} \KeywordTok{p.adjust}\NormalTok{(Pval_LM, }
+  \DataTypeTok{method =} \StringTok{"BH"}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{rename}\NormalTok{(}\DataTypeTok{EffSize_CR =}\NormalTok{ EffSize_LM, }
+  \DataTypeTok{Pval_CR =}\NormalTok{ Pval_LM, }\DataTypeTok{FDR_CR =}\NormalTok{ FDR_LM) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{EffSize_CR =} \DecValTok{-1} \OperatorTok{*}\StringTok{ }
+\StringTok{  }\NormalTok{EffSize_CR)  }\CommentTok{# Switch sign }
+
+\CommentTok{# Combine the data}
+\NormalTok{HCR_stat_sva <-}\StringTok{ }\KeywordTok{Reduce}\NormalTok{(dplyr}\OperatorTok{::}\NormalTok{full_join, }\KeywordTok{list}\NormalTok{(hc_stat_sva, hr_stat_sva, }
+\NormalTok{  cr_stat_sva))}
+
+\NormalTok{openxlsx}\OperatorTok{::}\KeywordTok{write.xlsx}\NormalTok{(HCR_stat_sva, }\DataTypeTok{file =} \StringTok{"peb_data/output/HCR_stat_sva.xlsx"}\NormalTok{, }
+  \DataTypeTok{colNames =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{borders =} \StringTok{"columns"}\NormalTok{, }\DataTypeTok{sheetName =} \StringTok{"Full Table"}\NormalTok{)}
+
+\KeywordTok{save}\NormalTok{(hc_stat_sva, hr_stat_sva, cr_stat_sva, HCR_stat_sva, }\DataTypeTok{file =} \StringTok{"peb_data/output/Linear_Modeling_Statistics_SVA.RData"}\NormalTok{)}
+
+\KeywordTok{save}\NormalTok{(svaobj, }\DataTypeTok{file =} \StringTok{"peb_data/output/Surrogate_Variables.RData"}\NormalTok{)}
+
+\CommentTok{# Now calculate species specific genes with SVs}
+
+\CommentTok{# Human first!}
+\NormalTok{Hsap_Spec_sva <-}\StringTok{ }\NormalTok{HCR_stat_sva }\OperatorTok{%>%}\StringTok{ }\KeywordTok{filter}\NormalTok{(FDR_HC }\OperatorTok{<}\StringTok{ }\FloatTok{0.05}\NormalTok{, FDR_HR }\OperatorTok{<}\StringTok{ }
+\StringTok{  }\FloatTok{0.05}\NormalTok{, FDR_CR }\OperatorTok{>}\StringTok{ }\FloatTok{0.1}\NormalTok{, }\KeywordTok{sign}\NormalTok{(EffSize_HC) }\OperatorTok{==}\StringTok{ }\KeywordTok{sign}\NormalTok{(EffSize_HR))}
+
+\CommentTok{# Let's check how many genes survived}
+\KeywordTok{dim}\NormalTok{(Hsap_Spec_sva)}
+\CommentTok{## [1] 324  10}
+
+\NormalTok{DT}\OperatorTok{::}\KeywordTok{datatable}\NormalTok{(Hsap_Spec_sva, }\DataTypeTok{options =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{pageLength =} \DecValTok{10}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{htmlwidget-78b6872d546cc16a4cad}{}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+
+\CommentTok{# Now chimp specific}
+\NormalTok{PanTro_Spec_sva <-}\StringTok{ }\NormalTok{HCR_stat_sva }\OperatorTok{%>%}\StringTok{ }\KeywordTok{filter}\NormalTok{(FDR_HC }\OperatorTok{<}\StringTok{ }\FloatTok{0.05}\NormalTok{, FDR_HR }\OperatorTok{>}\StringTok{ }
+\StringTok{  }\FloatTok{0.1}\NormalTok{, FDR_CR }\OperatorTok{<}\StringTok{ }\FloatTok{0.05}\NormalTok{, }\KeywordTok{sign}\NormalTok{(}\OperatorTok{-}\DecValTok{1} \OperatorTok{*}\StringTok{ }\NormalTok{EffSize_HC) }\OperatorTok{==}\StringTok{ }\KeywordTok{sign}\NormalTok{(EffSize_CR))}
+
+\KeywordTok{dim}\NormalTok{(PanTro_Spec_sva)}
+\CommentTok{## [1] 199  10}
+
+\NormalTok{DT}\OperatorTok{::}\KeywordTok{datatable}\NormalTok{(PanTro_Spec_sva, }\DataTypeTok{options =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{pageLength =} \DecValTok{10}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{htmlwidget-c5f8c7ab9ff923acfc8d}{}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{# Now macaque specific}
+\NormalTok{RheMac_Spec_sva <-}\StringTok{ }\NormalTok{HCR_stat_sva }\OperatorTok{%>%}\StringTok{ }\KeywordTok{filter}\NormalTok{(FDR_HC }\OperatorTok{>}\StringTok{ }\FloatTok{0.1}\NormalTok{, FDR_HR }\OperatorTok{<}\StringTok{ }
+\StringTok{  }\FloatTok{0.05}\NormalTok{, FDR_CR }\OperatorTok{<}\StringTok{ }\FloatTok{0.05}\NormalTok{, }\KeywordTok{sign}\NormalTok{(}\OperatorTok{-}\DecValTok{1} \OperatorTok{*}\StringTok{ }\NormalTok{EffSize_HR) }\OperatorTok{==}\StringTok{ }\KeywordTok{sign}\NormalTok{(}\OperatorTok{-}\DecValTok{1} \OperatorTok{*}\StringTok{ }\NormalTok{EffSize_CR))}
+
+\KeywordTok{dim}\NormalTok{(RheMac_Spec_sva)}
+\CommentTok{## [1] 1933   10}
+
+\NormalTok{DT}\OperatorTok{::}\KeywordTok{datatable}\NormalTok{(RheMac_Spec_sva, }\DataTypeTok{options =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{pageLength =} \DecValTok{10}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{htmlwidget-f40fd67c2027a709d8c7}{}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{# Save the data that we will explore later}
+\KeywordTok{save}\NormalTok{(Hsap_Spec_sva, PanTro_Spec_sva, RheMac_Spec_sva, }\DataTypeTok{file =} \StringTok{"peb_data/output/Species_Specific_DGE_SVA.RData"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{balance-the-gene-expression-for-covariates}{%
+\section{Balance the gene expression for covariates}\label{balance-the-gene-expression-for-covariates}}
+
+We calculated the DGE with/without SVs based on linear modeling.
+However, the normalized data is not actually adjusted for any of these covariates. The covariates are taken into account in the modeling but the input data is not changed.
+
+Why do we care about this?
+
+Gene expression data should be balanced by these covariates because you have some variance that is explained by each covariate, minimal or large.
+
+Applying residualization procedure, we will remove all the variance explained by covariates and eventually unwanted sources of variations.
+
+This step is important for any visualizations or additional analysis (e.g.~coexpression based on correlation) you want to apply: the data must be adjusted before.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{# For this part we will need the log2 scaled cpm filtered and}
+\CommentTok{# the total demographic with the SVs.  We will regress out}
+\CommentTok{# everything except SPECIES.  You don't want to remove the}
+\CommentTok{# variance explained by species right? :-)}
+
+\CommentTok{# Residualisation procedure}
+\NormalTok{avebeta.lm <-}\StringTok{ }\KeywordTok{lapply}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\KeywordTok{nrow}\NormalTok{(logCPM_filtered), }\ControlFlowTok{function}\NormalTok{(x) \{}
+  \CommentTok{# Remove Species!}
+  \KeywordTok{lm}\NormalTok{(}\KeywordTok{unlist}\NormalTok{(logCPM_filtered[x, ]) }\OperatorTok{~}\StringTok{ }\NormalTok{., }\DataTypeTok{data =}\NormalTok{ metadata_sv[}\KeywordTok{c}\NormalTok{(}\OperatorTok{-}\DecValTok{1}\NormalTok{)])}
+\NormalTok{\})}
+\CommentTok{# Get the residuals}
+\NormalTok{residuals <-}\StringTok{ }\KeywordTok{lapply}\NormalTok{(avebeta.lm, }\ControlFlowTok{function}\NormalTok{(x) }\KeywordTok{residuals}\NormalTok{(}\KeywordTok{summary}\NormalTok{(x)))}
+\NormalTok{residuals <-}\StringTok{ }\KeywordTok{do.call}\NormalTok{(rbind, residuals)}
+
+\NormalTok{logCPM_adjusted <-}\StringTok{ }\NormalTok{residuals }\OperatorTok{+}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\KeywordTok{apply}\NormalTok{(logCPM_filtered, }
+  \DecValTok{1}\NormalTok{, mean), }\DataTypeTok{nrow =} \KeywordTok{nrow}\NormalTok{(residuals), }\DataTypeTok{ncol =} \KeywordTok{ncol}\NormalTok{(residuals))}
+
+\KeywordTok{rownames}\NormalTok{(logCPM_adjusted) <-}\StringTok{ }\KeywordTok{rownames}\NormalTok{(logCPM_filtered)}
+
+\CommentTok{# Save the data}
+\KeywordTok{save}\NormalTok{(logCPM_adjusted, }\DataTypeTok{file =} \StringTok{"peb_data/output/logCPM_adjusted.RData"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{dge-visualizations}{%
+\section{DGE visualizations}\label{dge-visualizations}}
+
+Now we calculated the species-specific DGE (with/without SVs).
+Now it's time to check the genes we idenfied.
+We will work on the SV adjusted data
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{# Let's make some diagnostic plots! }
+\CommentTok{# Let's have a look to the p-value distribution of H vs C}
+\KeywordTok{gghistogram}\NormalTok{(HCR_stat_sva, }
+            \DataTypeTok{x =} \StringTok{"Pval_HC"}\NormalTok{,}
+            \DataTypeTok{color =} \StringTok{"blue"}
+\NormalTok{            )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics[width=0.65\linewidth]{bookdown-demo_files/figure-latex/visualizations-1} \end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{# Let's have a look to the p-value distribution of H vs R}
+\KeywordTok{gghistogram}\NormalTok{(HCR_stat_sva, }
+            \DataTypeTok{x =} \StringTok{"Pval_HR"}\NormalTok{,}
+            \DataTypeTok{color =} \StringTok{"red"}
+\NormalTok{            )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics[width=0.65\linewidth]{bookdown-demo_files/figure-latex/visualizations-2} \end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{# Let's have a look to the p-value distribution of C vs R}
+\KeywordTok{gghistogram}\NormalTok{(HCR_stat_sva, }
+            \DataTypeTok{x =} \StringTok{"Pval_CR"}\NormalTok{,}
+            \DataTypeTok{color =} \StringTok{"green"}
+\NormalTok{            )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics[width=0.65\linewidth]{bookdown-demo_files/figure-latex/visualizations-3} \end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{# Now let's have a look to the concordance between effect sizes of Hspc Genes}
+\KeywordTok{ggscatter}\NormalTok{(Hsap_Spec_sva, }
+          \DataTypeTok{x =} \StringTok{"EffSize_HC"}\NormalTok{, }
+          \DataTypeTok{y =} \StringTok{"EffSize_HR"}\NormalTok{,}
+          \DataTypeTok{add =} \StringTok{"reg.line"}\NormalTok{,                       }
+          \DataTypeTok{conf.int =} \OtherTok{TRUE}\NormalTok{, }
+          \DataTypeTok{add.params =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{color =} \StringTok{"blue"}\NormalTok{,}
+                            \DataTypeTok{fill =} \StringTok{"lightgray"}\NormalTok{)}
+\NormalTok{          ) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{stat_cor}\NormalTok{(}\DataTypeTok{method =} \StringTok{"pearson"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics[width=0.65\linewidth]{bookdown-demo_files/figure-latex/visualizations-4} \end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{# Boxplot for a gene}
+\NormalTok{tmp <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{Species =}\NormalTok{ demo}\OperatorTok{$}\NormalTok{Species, }\DataTypeTok{GeneExp =} \KeywordTok{as.numeric}\NormalTok{(logCPM_filtered[}\StringTok{"MET"}\NormalTok{,]))}
+
+\NormalTok{comp <-}\StringTok{ }\KeywordTok{list}\NormalTok{( }\KeywordTok{c}\NormalTok{(}\StringTok{"Hsap"}\NormalTok{, }\StringTok{"PanTro"}\NormalTok{), }
+              \KeywordTok{c}\NormalTok{(}\StringTok{"Hsap"}\NormalTok{, }\StringTok{"RheMac"}\NormalTok{), }
+              \KeywordTok{c}\NormalTok{(}\StringTok{"PanTro"}\NormalTok{, }\StringTok{"RheMac"}\NormalTok{))}
+
+\KeywordTok{ggboxplot}\NormalTok{(tmp, }
+          \DataTypeTok{x =} \StringTok{"Species"}\NormalTok{, }
+          \DataTypeTok{y =} \StringTok{"GeneExp"}\NormalTok{,}
+          \DataTypeTok{color =} \StringTok{"Species"}\NormalTok{, }
+          \DataTypeTok{palette =} \KeywordTok{c}\NormalTok{(}\StringTok{"red"}\NormalTok{,}\StringTok{"green"}\NormalTok{,}\StringTok{"blue"}\NormalTok{))}\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{stat_compare_means}\NormalTok{(}\DataTypeTok{comparisons =}\NormalTok{ comp, }\DataTypeTok{method =} \StringTok{"t.test"}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{stat_compare_means}\NormalTok{(}\DataTypeTok{method =} \StringTok{"anova"}\NormalTok{)  }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics[width=0.65\linewidth]{bookdown-demo_files/figure-latex/visualizations-5} \end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{# let's make a heatmap of the human specifc genes! }
+\CommentTok{# We will use the expression balanced by covariates and the SVs}
+\CommentTok{# Let's make a matrix for the data}
+\NormalTok{genes <-}\StringTok{ }\NormalTok{Hsap_Spec_sva}\OperatorTok{$}\NormalTok{Gene}
+\NormalTok{mat <-}\StringTok{ }\NormalTok{logCPM_adjusted[}\KeywordTok{rownames}\NormalTok{(logCPM_adjusted) }\OperatorTok{%in%}\StringTok{ }\NormalTok{genes,]}
+
+\CommentTok{# Let's make a heatmap! }
+\KeywordTok{pheatmap}\NormalTok{(mat,}
+            \DataTypeTok{cluster_cols=}\NormalTok{F,}
+            \DataTypeTok{scale=}\StringTok{"row"}\NormalTok{,}
+            \DataTypeTok{color =} \KeywordTok{colorRampPalette}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{"navy"}\NormalTok{, }\StringTok{"white"}\NormalTok{, }\StringTok{"firebrick3"}\NormalTok{))(}\DecValTok{50}\NormalTok{),}
+            \DataTypeTok{annotation=}\NormalTok{metadata_sv, }\CommentTok{# add the annotation}
+            \DataTypeTok{show_rownames =}\NormalTok{ F,}
+            \DataTypeTok{show_colnames=}\NormalTok{F,}
+            \DataTypeTok{cutree_cols =} \DecValTok{3}\NormalTok{,}
+            \DataTypeTok{clustering_method =} \StringTok{"ward.D2"}
+\NormalTok{            )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics[width=0.65\linewidth]{bookdown-demo_files/figure-latex/visualizations-6} \end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{# Now let's make a vulcano plot with the top genes annotated}
+\CommentTok{# First let's create a temporary file with some coloring information}
+\NormalTok{tmp <-}\StringTok{ }\NormalTok{HCR_stat_sva }\OperatorTok{%>%}
+\StringTok{        }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{LOG =} \OperatorTok{-}\KeywordTok{log10}\NormalTok{(FDR_HC),}
+  \DataTypeTok{Threshold =} \KeywordTok{case_when}\NormalTok{(Gene }\OperatorTok{%in%}\StringTok{ }\NormalTok{Hsap_Spec_sva}\OperatorTok{$}\NormalTok{Gene }\OperatorTok{~}\StringTok{ "DGE"}\NormalTok{, }\OperatorTok{!}\NormalTok{(Gene }\OperatorTok{%in%}\StringTok{ }\NormalTok{Hsap_Spec_sva}\OperatorTok{$}\NormalTok{Gene) }\OperatorTok{~}\StringTok{ "NotDGE"}\NormalTok{),}
+  \DataTypeTok{Direction =} \KeywordTok{case_when}\NormalTok{(EffSize_HC }\OperatorTok{>}\StringTok{ }\DecValTok{0} \OperatorTok{~}\StringTok{ "UP"}\NormalTok{,EffSize_HC }\OperatorTok{<}\StringTok{ }\DecValTok{0} \OperatorTok{~}\StringTok{ "DOWN"}\NormalTok{))}
+
+\CommentTok{# First let's create a temporary file with the top genes you wanna visualize}
+\NormalTok{top_labelled <-}\StringTok{ }\KeywordTok{tbl_df}\NormalTok{(tmp) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{                    }\KeywordTok{filter}\NormalTok{(Threshold }\OperatorTok{==}\StringTok{ "DGE"}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{                    }\KeywordTok{group_by}\NormalTok{(Direction) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{                    }\KeywordTok{top_n}\NormalTok{(}\DataTypeTok{n =} \DecValTok{15}\NormalTok{, }\DataTypeTok{wt =} \KeywordTok{abs}\NormalTok{(EffSize_HC)) }\CommentTok{# Top by fold change}
+
+\KeywordTok{ggscatter}\NormalTok{(tmp, }
+      \DataTypeTok{x =} \StringTok{"EffSize_HC"}\NormalTok{, }
+      \DataTypeTok{y =} \StringTok{"LOG"}\NormalTok{, }
+      \DataTypeTok{color =} \StringTok{"Threshold"}\NormalTok{,}
+      \DataTypeTok{shape =} \StringTok{"Direction"}\NormalTok{,}
+      \DataTypeTok{size=}\DecValTok{2}\NormalTok{,}
+      \DataTypeTok{alpha=}\FloatTok{0.5}\NormalTok{,}
+      \DataTypeTok{palette =} \KeywordTok{c}\NormalTok{(}\StringTok{"cyan4"}\NormalTok{, }\StringTok{"grey60"}\NormalTok{))}\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{geom_hline}\NormalTok{(}\DataTypeTok{yintercept =} \FloatTok{1.3}\NormalTok{, }\DataTypeTok{colour =} \StringTok{"red"}\NormalTok{,}\DataTypeTok{linetype=}\StringTok{"dotted"}\NormalTok{,}\DataTypeTok{size=}\DecValTok{1}\NormalTok{,}\DataTypeTok{alpha=}\FloatTok{0.5}\NormalTok{) }\OperatorTok{+}
+\StringTok{    }\KeywordTok{geom_vline}\NormalTok{(}\DataTypeTok{xintercept =} \DecValTok{0}\NormalTok{, }\DataTypeTok{colour =} \StringTok{"black"}\NormalTok{,}\DataTypeTok{linetype=}\StringTok{"dotted"}\NormalTok{,}\DataTypeTok{size=}\DecValTok{1}\NormalTok{,}\DataTypeTok{alpha=}\FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{geom_text_repel}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ top_labelled, }
+                          \DataTypeTok{mapping =} \KeywordTok{aes}\NormalTok{(}\DataTypeTok{label =}\NormalTok{ Gene), }
+                          \DataTypeTok{size =} \DecValTok{3}\NormalTok{,}
+                          \DataTypeTok{box.padding =} \KeywordTok{unit}\NormalTok{(}\FloatTok{0.4}\NormalTok{, }\StringTok{"lines"}\NormalTok{),}
+                          \DataTypeTok{point.padding =} \KeywordTok{unit}\NormalTok{(}\FloatTok{0.4}\NormalTok{, }\StringTok{"lines"}\NormalTok{)) }\OperatorTok{+}
+\StringTok{    }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{legend.position=}\StringTok{"none"}\NormalTok{)}\OperatorTok{+}
+\StringTok{    }\KeywordTok{xlab}\NormalTok{(}\StringTok{"log2(FC)"}\NormalTok{)}\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{ylab}\NormalTok{(}\StringTok{"-log10(FDR)"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics[width=0.65\linewidth]{bookdown-demo_files/figure-latex/visualizations-7} \end{center}
+
+\hypertarget{functional-enrichment}{%
+\section{Functional Enrichment}\label{functional-enrichment}}
+
+DGE analysis provides genes that are found differentially expressed between two or more groups of samples.
+
+How can we interpret so many genes?
+
+Functional enrichment might help with that!
+Instead of going through each individual gene to have some clues about what kind of biological function the gene has, we can apply
+enrichment analyses of functional terms that appear associated to the given set of differentially expressed genes more often than expected by chance. The functional terms usually are associated to multiple genes (e.g.~synaptic transmission).
+So genes can be clustered together and gene ontology analysis helps to quickly find out systematic changes that can describe differences between groups of samples.
+
+We can use R for that using some libraries such as \textbf{gProfileR} or \textbf{GOStats} or \textbf{clusterProfiler} or going online with tools such as \textbf{ToppGene} (\url{https://toppgene.cchmc.org/}).
+
+Today we are going to use quickly clusterProfiler.
+
+Let's staaaart!
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{# We are going to analyze the human specific genes!}
+\KeywordTok{head}\NormalTok{(Hsap_Spec_sva)}
+\CommentTok{##    Gene EffSize_HC   Pval_HC   FDR_HC EffSize_HR   Pval_HR}
+\CommentTok{## 1  ACP2    -0.7700 0.0009982 0.018184    -1.0425 0.0001799}
+\CommentTok{## 2 ACSM1    -1.8683 0.0000475 0.002875    -1.5574 0.0000949}
+\CommentTok{## 3 ADCY6     0.7374 0.0030412 0.034226     0.9758 0.0001342}
+\CommentTok{## 4 ADTRP     2.4842 0.0033051 0.035828     2.3779 0.0031442}
+\CommentTok{## 5 AGBL1    -1.9622 0.0052972 0.047965    -1.5544 0.0014893}
+\CommentTok{## 6 AGFG2     0.6328 0.0001778 0.006311     0.5425 0.0148278}
+\CommentTok{##      FDR_HR EffSize_CR Pval_CR FDR_CR}
+\CommentTok{## 1 0.0012257   -0.14770 0.33414 0.4476}
+\CommentTok{## 2 0.0007821    0.41314 0.09177 0.1664}
+\CommentTok{## 3 0.0010035    0.24530 0.06662 0.1293}
+\CommentTok{## 4 0.0103883   -0.06809 0.91202 0.9405}
+\CommentTok{## 5 0.0058599   -0.04552 0.85263 0.8972}
+\CommentTok{## 6 0.0347538   -0.17914 0.31631 0.4286}
+
+\CommentTok{# Create a table with Gene Symbol translated}
+\NormalTok{GenesOfInterest <-}\StringTok{ }\KeywordTok{bitr}\NormalTok{(}\KeywordTok{as.character}\NormalTok{(Hsap_Spec_sva}\OperatorTok{$}\NormalTok{Gene), }\DataTypeTok{fromType =} \StringTok{"SYMBOL"}\NormalTok{, }
+  \DataTypeTok{toType =} \KeywordTok{c}\NormalTok{(}\StringTok{"ENSEMBL"}\NormalTok{, }\StringTok{"ENTREZID"}\NormalTok{), }\DataTypeTok{OrgDb =}\NormalTok{ org.Hs.eg.db)}
+
+\CommentTok{# Time for enrichment!  You can try biological processes}
+\CommentTok{# (BP), cellular compontent (CC), and/or molecular function}
+\CommentTok{# (MF)}
+\NormalTok{Hsap_GO <-}\StringTok{ }\KeywordTok{enrichGO}\NormalTok{(}\DataTypeTok{gene =} \KeywordTok{unique}\NormalTok{(GenesOfInterest}\OperatorTok{$}\NormalTok{ENTREZID), }
+  \DataTypeTok{keyType =} \StringTok{"ENTREZID"}\NormalTok{, }\DataTypeTok{OrgDb =}\NormalTok{ org.Hs.eg.db, }\DataTypeTok{ont =} \StringTok{"BP"}\NormalTok{, }\DataTypeTok{pAdjustMethod =} \StringTok{"none"}\NormalTok{, }
+  \DataTypeTok{pvalueCutoff =} \FloatTok{0.05}\NormalTok{, }\DataTypeTok{qvalueCutoff =} \DecValTok{1}\NormalTok{, }\DataTypeTok{readable =} \OtherTok{TRUE}\NormalTok{)}
+
+\NormalTok{DT}\OperatorTok{::}\KeywordTok{datatable}\NormalTok{(}\KeywordTok{as.data.frame}\NormalTok{(Hsap_GO), }\DataTypeTok{options =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{pageLength =} \DecValTok{10}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{htmlwidget-d17cf4080686b93cfbc9}{}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+
+\CommentTok{# Kegg Pathways!}
+\NormalTok{Hsap_KEGG <-}\StringTok{ }\KeywordTok{enrichKEGG}\NormalTok{(}\DataTypeTok{gene =} \KeywordTok{unique}\NormalTok{(GenesOfInterest}\OperatorTok{$}\NormalTok{ENTREZID), }
+  \DataTypeTok{organism =} \StringTok{"hsa"}\NormalTok{, }\DataTypeTok{pAdjustMethod =} \StringTok{"none"}\NormalTok{, }\DataTypeTok{pvalueCutoff =} \FloatTok{0.05}\NormalTok{, }
+  \DataTypeTok{qvalueCutoff =} \DecValTok{1}\NormalTok{)}
+
+\NormalTok{DT}\OperatorTok{::}\KeywordTok{datatable}\NormalTok{(}\KeywordTok{as.data.frame}\NormalTok{(Hsap_KEGG), }\DataTypeTok{options =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{pageLength =} \DecValTok{10}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{htmlwidget-973e359619ea20b8fc9c}{}
+
+\hypertarget{dge-based-on-deseq2}{%
+\section{DGE based on DESeq2}\label{dge-based-on-deseq2}}
+
+Now we are going to touch base with \textbf{DESeq2} (\url{https://bioconductor.org/packages/release/bioc/html/DESeq2.html}). This method apply a different normalization called Variance Stabilizing Transformation (VST). This method is based on the Negative Binomial distributed counts. It is a variant of the Arc-hyperbolic-sine transformation (asinh).
+Therefore, the input for DESeq2 is the count matrix and the modeling design.
+
+Let's start then!
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{# We will perform the DESeq analysisn on H vs C with SVA We}
+\CommentTok{# will need the demoHC, the logCPM_HC, and the row counts.}
+
+\CommentTok{# First we need to filter the expressed genes for H and C}
+\CommentTok{# from the raw counts!  This are the genes considered}
+\CommentTok{# expressed!}
+\NormalTok{genes <-}\StringTok{ }\KeywordTok{rownames}\NormalTok{(logCPM_filtered)}
+
+\CommentTok{# Subset the counts}
+\NormalTok{counts_HC <-}\StringTok{ }\NormalTok{exp[}\KeywordTok{rownames}\NormalTok{(exp) }\OperatorTok{%in%}\StringTok{ }\NormalTok{genes, }\KeywordTok{grep}\NormalTok{(}\StringTok{"Hsap|PanTro"}\NormalTok{, }
+  \KeywordTok{colnames}\NormalTok{(exp))]}
+
+\CommentTok{# Now let's run DESeq2}
+\NormalTok{ddsHC <-}\StringTok{ }\KeywordTok{DESeqDataSetFromMatrix}\NormalTok{(}\DataTypeTok{countData =}\NormalTok{ counts_HC, }\DataTypeTok{colData =}\NormalTok{ demoHC, }
+  \DataTypeTok{design =} \KeywordTok{as.formula}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"~"}\NormalTok{, }\KeywordTok{paste}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\KeywordTok{colnames}\NormalTok{(demoHC)), }
+    \DataTypeTok{collapse =} \StringTok{"+"}\NormalTok{))))}
+
+\NormalTok{ddsHC <-}\StringTok{ }\KeywordTok{estimateSizeFactors}\NormalTok{(ddsHC)  }\CommentTok{# Estimate Size factors for VST}
+\NormalTok{ddsHC <-}\StringTok{ }\KeywordTok{DESeq}\NormalTok{(ddsHC, }\DataTypeTok{full =} \KeywordTok{design}\NormalTok{(ddsHC), }\DataTypeTok{parallel =} \OtherTok{TRUE}\NormalTok{)  }\CommentTok{# Run DESeq2}
+\NormalTok{deseq_HC <-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{results}\NormalTok{(ddsHC, }\DataTypeTok{contrast =} \KeywordTok{c}\NormalTok{(}\StringTok{"Species"}\NormalTok{, }
+  \StringTok{"Hsap"}\NormalTok{, }\StringTok{"PanTro"}\NormalTok{), }\DataTypeTok{cooksCutoff =} \OtherTok{FALSE}\NormalTok{))}
+
+\CommentTok{# Have a look to the info!}
+\NormalTok{DT}\OperatorTok{::}\KeywordTok{datatable}\NormalTok{(deseq_HC, }\DataTypeTok{options =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{pageLength =} \DecValTok{10}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{htmlwidget-72093435cc6a0a183319}{}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{# Here for Human vs Macque}
+\NormalTok{counts_HR <-}\StringTok{ }\NormalTok{exp[}\KeywordTok{rownames}\NormalTok{(exp) }\OperatorTok{%in%}\StringTok{ }\NormalTok{genes, }\KeywordTok{grep}\NormalTok{(}\StringTok{"Hsap|RheMac"}\NormalTok{, }
+  \KeywordTok{colnames}\NormalTok{(exp))]}
+
+\NormalTok{ddsHR <-}\StringTok{ }\KeywordTok{DESeqDataSetFromMatrix}\NormalTok{(}\DataTypeTok{countData =}\NormalTok{ counts_HR, }\DataTypeTok{colData =}\NormalTok{ demoHR, }
+  \DataTypeTok{design =} \KeywordTok{as.formula}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"~"}\NormalTok{, }\KeywordTok{paste}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\KeywordTok{colnames}\NormalTok{(demoHR)), }
+    \DataTypeTok{collapse =} \StringTok{"+"}\NormalTok{))))}
+
+\NormalTok{ddsHR <-}\StringTok{ }\KeywordTok{estimateSizeFactors}\NormalTok{(ddsHR)  }\CommentTok{# Estimate Size factors for VST}
+\NormalTok{ddsHR <-}\StringTok{ }\KeywordTok{DESeq}\NormalTok{(ddsHR, }\DataTypeTok{full =} \KeywordTok{design}\NormalTok{(ddsHR), }\DataTypeTok{parallel =} \OtherTok{TRUE}\NormalTok{)  }\CommentTok{# Run DESeq2}
+\NormalTok{deseq_HR <-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{results}\NormalTok{(ddsHR, }\DataTypeTok{contrast =} \KeywordTok{c}\NormalTok{(}\StringTok{"Species"}\NormalTok{, }
+  \StringTok{"Hsap"}\NormalTok{, }\StringTok{"RheMac"}\NormalTok{), }\DataTypeTok{cooksCutoff =} \OtherTok{FALSE}\NormalTok{))}
+
+\NormalTok{DT}\OperatorTok{::}\KeywordTok{datatable}\NormalTok{(deseq_HR, }\DataTypeTok{options =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{pageLength =} \DecValTok{10}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{htmlwidget-8698d6599fd3fc9738c8}{}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\CommentTok{# And Chimp vs Macaque}
+\NormalTok{counts_CR <-}\StringTok{ }\NormalTok{exp[}\KeywordTok{rownames}\NormalTok{(exp) }\OperatorTok{%in%}\StringTok{ }\NormalTok{genes, }\KeywordTok{grep}\NormalTok{(}\StringTok{"PanTro|RheMac"}\NormalTok{, }
+  \KeywordTok{colnames}\NormalTok{(exp))]}
+
+\NormalTok{ddsCR <-}\StringTok{ }\KeywordTok{DESeqDataSetFromMatrix}\NormalTok{(}\DataTypeTok{countData =}\NormalTok{ counts_CR, }\DataTypeTok{colData =}\NormalTok{ demoCR, }
+  \DataTypeTok{design =} \KeywordTok{as.formula}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"~"}\NormalTok{, }\KeywordTok{paste}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\KeywordTok{colnames}\NormalTok{(demoCR)), }
+    \DataTypeTok{collapse =} \StringTok{"+"}\NormalTok{))))}
+
+\NormalTok{ddsCR <-}\StringTok{ }\KeywordTok{estimateSizeFactors}\NormalTok{(ddsCR)  }\CommentTok{# Estimate Size factors for VST}
+\NormalTok{ddsCR <-}\StringTok{ }\KeywordTok{DESeq}\NormalTok{(ddsCR, }\DataTypeTok{full =} \KeywordTok{design}\NormalTok{(ddsCR), }\DataTypeTok{parallel =} \OtherTok{TRUE}\NormalTok{)  }\CommentTok{# Run DESeq2}
+\NormalTok{deseq_CR <-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{results}\NormalTok{(ddsCR, }\DataTypeTok{contrast =} \KeywordTok{c}\NormalTok{(}\StringTok{"Species"}\NormalTok{, }
+  \StringTok{"PanTro"}\NormalTok{, }\StringTok{"RheMac"}\NormalTok{), }\DataTypeTok{cooksCutoff =} \OtherTok{FALSE}\NormalTok{))}
+
+\NormalTok{DT}\OperatorTok{::}\KeywordTok{datatable}\NormalTok{(deseq_CR, }\DataTypeTok{options =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{pageLength =} \DecValTok{10}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{htmlwidget-6864160d6d855a80d969}{}
+
+\hypertarget{exercise-for-differential-expression-chapter}{%
+\section{Exercise for Differential Expression Chapter}\label{exercise-for-differential-expression-chapter}}
+
+\begin{itemize}
+\item
+  Calculate DGE with DESeq with SVs
+\item
+  Define Species-Specific DGE based on DESeq2 analysis
+\item
+  Visualize Species-Specific DGE based on DESeq2
+\item
+  Diagnostic analysis and functional interpretation of DESeq2 results
+\end{itemize}
+
+\bibliography{book.bib}
+
+
+\end{document}
