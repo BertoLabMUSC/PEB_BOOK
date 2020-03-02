@@ -1,0 +1,194 @@
+# Introduction to RNA-seq pipes {#introPipes}
+
+```{r,setupProcessingReads,echo=FALSE, linewidth=60}
+library(knitr)
+opts_chunk$set(echo = TRUE,out.width='65%',fig.width=5.1, cache=TRUE,warning=FALSE,message=FALSE)
+```
+
+## Sequencing Machines
+
+Sequencing machines vary based on number of reads they sequence and running costs. Nowadays, the most used are NovaSeq and NextSeq 500, both illumina. 
+
+```{r out.width = "500px", fig.align='center', echo=FALSE, include=knitr::is_html_output(), fig.link=''}
+knitr::include_graphics('images/seqmachines.jpg', dpi = NA)
+```
+
+## FASTQ
+
+This is the files sequencing facilities usually provide. This output is the same for multiple data, from RNA-seq to ChIP-seq, ATAC-seq, and so on. The FASTQ file is a modified version of a FASTA file with some additional information. 
+
+```{r out.width = "500px", fig.align='center', echo=FALSE, include=knitr::is_html_output(), fig.link=''}
+knitr::include_graphics('images/fastq_fig.jpg', dpi = NA)
+```
+
+## Quality Check
+
+This is a step to understand the quality of the million of reads the FASTQ contains.
+It can be done using fastqc (https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) or in R with `library(fastqcr)` or `library(Rqc)` 
+
+Here a simple R example: 
+```{r,rqcStart,echo=TRUE, warning=FALSE,eval=FALSE, linewidth=60}
+BiocManager::install("Rqc")
+library(Rqc)
+# load the fastq.gz files in your specific directory
+quality_checks  <- rqc(path = "path_to_your_directory", 
+                       pattern = ".fastq.gz", 
+                       openBrowser=FALSE)
+
+rqcCycleQualityBoxPlot(quality_checks)
+rqcCycleBaseCallsLinePlot(quality_checks)
+```
+
+This will output similar plots and data quality check as fastqc.
+
+```{r out.width = "300px", fig.align='center', echo=FALSE, include=knitr::is_html_output(), fig.link=''}
+knitr::include_graphics('images/fastqc.jpg', dpi = NA)
+```
+
+## Quality Trimming
+
+After checking the quality you can decide to trim the reads or not. 
+Quality trimming is necessary to remove potential portion of the reads and/or base pairs with low quality. Low quality bases or fragments can affect mappability to the genome. 
+Trimming can be done using trimmomatic (http://www.usadellab.org/cms/?page=trimmomatic), fastx (http://hannonlab.cshl.edu/fastx_toolkit/), or Trim Galore (https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/).
+
+## Alignment
+
+After quality check and trimming, the reads can be aligned to the reference genome. The process map the reads into the genome using a specific set of coordinates for genes. Alignment algorithms tolerate mismatches between reads and genome increasing overall mappability quality. Reads can be multimapped (map to multiple places on the genome) or with overall low quality. Alignment algorithms provide a quality score (MAPQ) for each reads and this can be easily used for filtering bad reads and retain only reads with high quality score which is often linked to uniquely mapped reads. 
+
+There are different aligner for different type of NGS data.
+
+Here some example for ChIP-seq/ATAC-seq: 
+
+- BWA (http://bio-bwa.sourceforge.net/)
+
+- Bowtie2 (http://bowtie-bio.sourceforge.net/bowtie2/index.shtml)
+
+For RNA-seq data instead there are splice aware aligners. They require a gene annotation usually stored in a gtf file. GTF can be found in UCSC/Ensembl for different species. For model species such as human and mouse you can also find them in Genecode (https://www.gencodegenes.org/). These aligners can splice the reads that belongs to different portions of the genomes (e.g. two different exons separated by an intron):
+
+- STAR (https://github.com/alexdobin/STAR)
+
+- HISAT (https://ccb.jhu.edu/software/hisat2/index.shtml)
+
+First you will need to create a genome index. 
+Here an example for STAR:
+```{r,STARindex,echo=TRUE, warning=FALSE,eval=FALSE, linewidth=60}
+STAR --runMode genomeGenerate \
+--genomeDir Human_Genome_Directory/ \
+--genomeFastaFiles Human_Genome_Directory/*.fa \
+--runThreadN 13 \
+--sjdbGTFfile gene_annotation.gtf \
+--sjdbOverhang 75
+```
+
+Then you can start the alignment
+
+```{r,STARalignment,echo=TRUE, warning=FALSE,eval=FALSE, linewidth=60}
+for file in `ls *.Trim.fastq.gz`
+do
+outputname=`basename $file | sed -e "s/.Trim.fastq.gz//"`
+STAR --runThreadN 14 \
+--genomeDir Human_Genome_Directory/ \
+--readFilesIn $file \
+--readFilesCommand zcat \
+--sjdbGTFfile Human_Genome_Directory/gene_annotation.gtf \
+--outFilterType BySJout  \
+--outFilterMismatchNoverReadLmax 0.04 \
+--outFilterMultimapNmax 10 \
+--alignSJoverhangMin 10 \
+--alignSJDBoverhangMin 1 \
+--outSAMtype BAM SortedByCoordinate \
+--outSAMunmapped Within \
+--outFilterMismatchNmax 3 \
+--twopassMode Basic \
+--outFileNamePrefix $outputname \
+--chimSegmentMin 15 \
+--chimScoreMin 15 \
+--chimScoreSeparation 10 \
+--chimJunctionOverhangMin 15 \
+--quantMode TranscriptomeSAM
+echo $outputname
+done
+```
+
+## Statistics and Filtering
+
+Alignment will provide a SAM/BAM file that can be easily handle with samtools (https://github.com/samtools/). This format contains all the reads and the statistics from the alignment (mapped, unmapped, MAPQ, ...) with specific FLAG id. Ideally you want to work with uniquely mapped reads (e.g. reads that mapped into a single region). Some aligners can provide directly a bam file with only uniquely mapped reads. On the other hand, some aligner does not provide a flag for uniquely mapped (NH:i:1). Therefore you need to use MAPQ and filter for a specific threshold. As I descibed above,  MAPQ is a -log10(P-value). Therefore, we can apply a threshold for such quality score. 
+
+Here an example:
+```{r,SAMTOOLSmapq,echo=TRUE, warning=FALSE,eval=FALSE, linewidth=60}
+ls *.bam | parallel --progress --eta -j 15 'samtools view -bq 10 {} > {.}_mapQ10.bam'
+```
+
+Here the example for fetching uniquely mapped reads (from STAR):
+
+```{r,SAMTOOLSunique,echo=TRUE, warning=FALSE,eval=FALSE, linewidth=60}
+for file in `ls *.ex.bam`
+do
+  outputname=`basename $file | sed -e "s/.bam/.unique.bam/"`
+    (samtools view -H $file; samtools view -F 2308 $file | grep -w 'NH:i:1') | \
+    samtools view -bS - > "$outputname"
+  echo $file
+  echo $outputname
+done
+```
+
+Before and after filtering you can collect alignment statistics on the BAM file. This step can help with data handling and see whether there are biases on the sequencing you are analyzing. 
+One of the most used tool is picard (https://broadinstitute.github.io/picard/). Picard can be wrapped using picardmetrics (https://github.com/slowkow/picardmetrics), a tool that will collect directly multiple statictis. 
+
+```{r,picard,echo=TRUE, warning=FALSE,eval=FALSE, linewidth=60}
+find . -name "*.bam" | \
+  xargs -n 1 -P 12 -iFILES sh -c 'picardmetrics run -k -r -o PICARDMETRICS_OUT/ FILES;'; 
+```
+
+## Lift over
+
+When analyzing different species you need a good quality gene annotation for the downstream quantification. Unfortunately, the best annotations are always based on model species as **Human** and **Mouse**. 
+
+Therefore, it is necessary to translate coordinates of non-model species into model species for a better annotation. You can use these translated files with the primary annotation for the model species (in this case Human).
+
+There are tools that can help you with that: **liftOver** (https://genome.ucsc.edu/cgi-bin/hgLiftOver) and **CrossMap** (http://crossmap.sourceforge.net/)
+
+These methods are based on cross-species annotations that you can easily find at the **UCSC Genome Brower** website (e.g. https://hgdownload.soe.ucsc.edu/goldenPath/hg38/liftOver/). 
+
+Here an example for CrossMap:
+
+```{r,crossmap,echo=TRUE, warning=FALSE,eval=FALSE, linewidth=60}
+# Lifting a chimpanzee bam to human coordinates
+python CrossMap.py bam panTro4ToHg38.over.chain.gz Chimp_Input.bam Chimp_Output
+
+```
+
+## Quantification
+
+BAM files contain reads mapped to the genome with specific genomic coordinates (e.g. chromosome, start, end, strand). These information are used for the quantification per gene counting the reads that overlap with the genomic location of a specific gene. Nevertheless there are some issue the quantifications tool are aware of (e.g. different genes found in overlapping genomic locations but opposite strand). These confounding factors are taken into account during quantifications. 
+
+There are several typo of quantification methods. 
+
+Alignment free (or pseudoalignment): 
+
+- Salmon (https://salmon.readthedocs.io/en/latest/salmon.html)
+
+- Kallisto (https://pachterlab.github.io/kallisto/)
+
+- Sailfish (https://www.cs.cmu.edu/~ckingsf/software/sailfish/)
+
+Alignment based (they need a GTF and aligned reads):
+
+- HTSeq-Count (https://htseq.readthedocs.io/en/release_0.11.1/index.html)
+
+- featureCounts (http://bioinf.wehi.edu.au/featureCounts/)
+
+- RSEM (https://github.com/deweylab/RSEM)
+
+
+Here one example for HTSeq:
+
+```{r,htseq,echo=TRUE, warning=FALSE,eval=FALSE, linewidth=60}
+parallel -j 14 'samtools view {} | htseq-count -m intersection-strict \
+-t exon \
+-i gene_name \
+-s reverse \
+- Human_Genome_Directory/gene_annotation.gtf > {.}.txt' ::: *.unique.bam
+```
+
+The result of the quantification is a value per each gene per each sample. This is the raw count that determine how much this gene is expressed.

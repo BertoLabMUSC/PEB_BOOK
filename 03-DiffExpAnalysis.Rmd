@@ -1,0 +1,667 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+# Differential Expression Analysis {#DiffExpAnalysis}
+
+Differential expression analysis allows to test tens of thousands of hypotheses (one test for each gene) against the null hypothesis that the gene expression is the same between two or multiple species. 
+Some limiting factors: sample size, non-normally distribution of counts, high/low expressed genes. 
+Therefore, to apply any statistics, it is necessary to check the data first and apply the right modeling. 
+However, some tools such as DESeq2 address these limitations using statistical models in order to maximize the amount of knowledge that can be extracted from such noisy datasets. 
+
+In this chapter we will apply:
+
+- **Linear Model** 
+
+- **DESeq2**
+
+We will also use **Surrogates Variables (sva)**, a method used to detect sources of unwanted variation in high throughput sequencing. 
+
+We will then identify species specific differentially expressed genes which will be input for the functional/visualization chapter. 
+
+## Data loading
+
+**So let's start!** 
+
+```{r loadNormData}
+
+# First load the libraries we will use in this section
+suppressPackageStartupMessages(library(sva))
+suppressPackageStartupMessages(library(DESeq2))
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(openxlsx))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(ggpubr))
+suppressPackageStartupMessages(library(pheatmap))
+suppressPackageStartupMessages(library(here))
+suppressPackageStartupMessages(library(future.apply))
+suppressPackageStartupMessages(library(broom))
+suppressPackageStartupMessages(library(ggrepel))
+suppressPackageStartupMessages(library(DT))
+suppressPackageStartupMessages(library(clusterProfiler))
+suppressPackageStartupMessages(library(org.Hs.eg.db))
+
+# Multicore activated
+plan(multiprocess)
+
+# the data is stored under the subdirectory "data"
+list.files()
+
+# Remove previous loads
+rm(list=ls())
+
+# Create a directory where to save the data
+dir.create("peb_data/output/")
+
+# load the data you need
+load(here("peb_data","Normalized_data.RData"))
+
+# Check what data you loaded
+ls()
+
+```
+
+## DGE based on linear model
+
+We are going to define changes in gene expression between all the three species. 
+We will then apply a parsimony approach to define species-specific changes.
+Here a representation:
+
+```{r out.width = "400px", fig.align='center', echo=FALSE, include=knitr::is_html_output(), fig.link=''}
+knitr::include_graphics('images/parsimony.jpg', dpi = NA)
+```
+
+Let's start!
+
+```{r lm dge}
+
+# Filter the demographic for human-chimpanzee
+demoHC <- demo %>%
+            rownames_to_column("ID") %>%
+            filter(Species %in% c("Hsap","PanTro")) %>%
+            column_to_rownames("ID") %>%
+          droplevels() # Remove unwanted factors
+
+# First remove the genes with 0s. 
+logCPM <- log2(cpm + 1)
+
+# we need to filter the low expressed genes. 
+# Here we are going to use a fitler where all the samples express the gene > 0.5
+perc <- 100
+vec=round((ncol(logCPM) * perc)/100)
+notAllZero = (rowSums(logCPM>0)>=vec)
+logCPM_filtered=logCPM[notAllZero,]
+
+# you can also use a different percentage and/or a conditional filtering
+# Not to run
+#filter=apply(logCPM, 1, function(x) 
+# (all(x[grep("Hsap",names(x))] > 0) | 
+# all(x[grep("PanTro",names(x))] > 0)) | 
+# all(x[grep("RheMac",names(x))] > 0))
+#logCPM_filtered <- logCPM[filter,]
+
+# Now for the cpm and log2 transform to make the data normally distributed fetching Human and Chimp sample
+
+logCPM_HC <- logCPM_filtered[,grep("Hsap|PanTro",colnames(logCPM_filtered))]
+
+# Now we can start to plan the linear modeling for the analysis! 
+# The model you wanna fit with all the covariates. 
+model <- 'GeneExpr ~ Species + Age + Sex + Hemisphere + PMI + RIN' 
+
+# Create a temporary metadata
+tmpDemo <- demoHC
+
+# Function for fitting the model.
+fit_lm <- function(vectorizedExpression) {
+  tmpMetaData <- cbind(tmpDemo, data.frame(GeneExpr = unname(vectorizedExpression)))
+  residuals <- lm(model,data=tmpMetaData)
+  pval <- as.numeric(tidy(residuals)$p.value[2])
+  effect_size <- as.numeric(tidy(residuals)$estimate[2])
+  c(EffSize_LM = effect_size, Pval_LM = pval)
+}
+
+fit_the_mod <- function(vectorizedExpression) {
+  tryCatch(fit_lm(vectorizedExpression), error = function(e) 
+                            c(EffSize_LM = NA,Pval_LM = NA))
+}
+
+# Run the analysis and get the stats
+hc_stat <- apply(logCPM_HC, 1, fit_the_mod) %>%
+                    t() %>%
+                    as.data.frame() %>% 
+                    rownames_to_column("Gene") %>%
+                    # Adjust the p-value by FDR
+                    mutate(FDR_LM = p.adjust(Pval_LM,method="BH")) %>%
+                  # Relabel
+    dplyr::rename(EffSize_HC = EffSize_LM, Pval_HC = Pval_LM, FDR_HC = FDR_LM) %>%
+    # Switch sign
+    mutate(EffSize_HC = -1 * EffSize_HC)
+
+# Have a look to the data!
+#head(hc_stat)
+DT::datatable(hc_stat, options = list(pageLength = 10))
+
+# Now let's apply the same model for the other two comparisons (H vs R, C vs R)
+
+# Demo for HR
+demoHR <- demo %>%
+            rownames_to_column("ID") %>%
+            filter(Species %in% c("Hsap","RheMac")) %>%
+            column_to_rownames("ID") %>%
+          droplevels() 
+
+# Demo for CR
+demoCR <- demo %>%
+            rownames_to_column("ID") %>%
+            filter(Species %in% c("PanTro","RheMac")) %>%
+            column_to_rownames("ID") %>%
+          droplevels() 
+
+# Get the gene expression for HR and CR
+logCPM_HR <- logCPM_filtered[,grep("Hsap|RheMac",colnames(logCPM_filtered))]
+logCPM_CR <- logCPM_filtered[,grep("PanTro|RheMac",colnames(logCPM_filtered))]
+
+# Run the modeling HR
+tmpDemo <- demoHR
+
+hr_stat <- apply(logCPM_HR, 1, fit_the_mod) %>%
+                    t() %>%
+                    as.data.frame() %>% 
+                    rownames_to_column("Gene") %>%
+                    mutate(FDR_LM = p.adjust(Pval_LM,method="BH")) %>% 
+      dplyr::rename(EffSize_HR = EffSize_LM, Pval_HR = Pval_LM, FDR_HR = FDR_LM) %>%
+      mutate(EffSize_HR = -1 * EffSize_HR) # Switch sign
+
+# have a look to the data just created
+DT::datatable(hr_stat, options = list(pageLength = 10))
+
+# Run the modeling PR
+tmpDemo <- demoCR
+
+cr_stat <- apply(logCPM_CR, 1, fit_the_mod) %>%
+                    t() %>%
+                    as.data.frame() %>% 
+                    rownames_to_column("Gene") %>%
+                    mutate(FDR_LM = p.adjust(Pval_LM,method="BH")) %>%
+        dplyr::rename(EffSize_CR = EffSize_LM, Pval_CR = Pval_LM, FDR_CR = FDR_LM) %>%
+        mutate(EffSize_CR = -1 * EffSize_CR) # Switch sign
+
+# have a look to the data just created
+DT::datatable(cr_stat, options = list(pageLength = 10))
+
+# Now it's time to combine all the data together and save the files
+HCR_stat <- Reduce(dplyr::full_join, list(hc_stat, hr_stat, cr_stat))
+
+openxlsx::write.xlsx(HCR_stat, 
+                     file = "peb_data/output/HCR_stat.xlsx", 
+                     colNames = TRUE, 
+                     borders = "columns",
+                     sheetName="Full Table")
+
+save(hc_stat, hr_stat, cr_stat, HCR_stat, 
+     file = "peb_data/output/Linear_Modeling_Statistics.RData")
+
+# have a look to the data just created
+DT::datatable(HCR_stat, options = list(pageLength = 10))
+
+```
+
+## Species Specific DGE
+
+Now it's time to apply the parsimony to define the species-specific differentially expressed genes. This is based on adjusted p.value and also direction of the gene. 
+For instance, As in the picture, the genes should be differentially expressed in H vs C, H vs C but not in C vs R. We expect that also the fold change (effect size) will have the same direction in H vs C and H vs R.
+
+Let's start! 
+
+```{r parsimony}
+
+# Let's have another look to the input data
+head(HCR_stat)
+
+# We are going to define the species specific genes now. 
+#We are going to filter for FDRs and same direction of the effect sizes. 
+
+# Human first! 
+Hsap_Spec <- HCR_stat %>% 
+              filter(FDR_HC < 0.05, FDR_HR < 0.05, FDR_CR > 0.1,
+              sign(EffSize_HC) == sign(EffSize_HR))
+            
+# Let's check how many genes survived
+dim(Hsap_Spec)
+
+DT::datatable(Hsap_Spec, options = list(pageLength = 10))
+
+
+# Now chimp specific
+PanTro_Spec <- HCR_stat %>% 
+              filter(FDR_HC < 0.05, FDR_HR > 0.1, FDR_CR < 0.05,
+              sign(-1 * EffSize_HC) == sign(EffSize_CR))
+
+dim(PanTro_Spec)
+
+DT::datatable(PanTro_Spec, options = list(pageLength = 10))
+
+# Now macaque specific
+RheMac_Spec <- HCR_stat %>% 
+              filter(FDR_HC > 0.1, FDR_HR < 0.05, FDR_CR < 0.05,
+              sign(-1 * EffSize_HR) == sign(-1 * EffSize_CR)) 
+
+dim(RheMac_Spec)
+
+DT::datatable(RheMac_Spec, options = list(pageLength = 10))
+
+# Save the data
+save(Hsap_Spec, PanTro_Spec, RheMac_Spec, 
+     file = "peb_data/output/Species_Specific_DGE.RData")
+
+```
+
+## Surrogate Variables
+
+Now we ara going to add surrogates variable in the analysis.
+
+```{r sva dge}
+
+# We need the expressed genes
+head(logCPM_filtered)
+
+# Calculate the surrogate variables using SVA
+# First we need to create two model matrix, one for the fitting and one as null
+# The null model contains all the covaraites except the predictor (Species)
+
+mod <- model.matrix(~ Species + Age + Sex + Hemisphere + PMI + RIN, data = demo)
+mod0 <- model.matrix(~ Age + Sex + Hemisphere + PMI + RIN, data = demo)
+
+# Create SVA object (input the gene expression) with 100 permuation.
+svaobj <- sva(as.matrix(logCPM_filtered), 
+              mod, 
+              mod0, 
+              n.sv=NULL, 
+              B=100, 
+              method="two-step")
+
+# Get the surrogates variables
+svaobj$sv = data.frame(svaobj$sv)
+colnames(svaobj$sv) = c(paste0('SV',seq(svaobj$n.sv)))
+metadata_sv <- cbind(demo,svaobj$sv)
+
+# Recreate demographics
+demoHC_sv <- metadata_sv %>% 
+                rownames_to_column("ID") %>% 
+                filter(Species %in% c("Hsap","PanTro")) %>% 
+                column_to_rownames("ID") %>% 
+              droplevels()
+
+demoHR_sv <- metadata_sv %>%
+                rownames_to_column("ID") %>% 
+                filter(Species %in% c("Hsap","RheMac")) %>% 
+                column_to_rownames("ID") %>% 
+              droplevels()
+
+demoCR_sv <- metadata_sv %>% 
+                rownames_to_column("ID") %>% 
+                filter(Species %in% c("PanTro","RheMac")) %>% 
+                column_to_rownames("ID") %>% 
+              droplevels()
+
+# Let's add the SV into the model and run the analysis! 
+model <-  as.formula(paste('GeneExpr ~',paste(c(colnames(demoHC_sv)), collapse= "+")))
+
+tmpDemo <- demoHC_sv
+
+# Run the analysis and get the stats
+hc_stat_sva <- apply(logCPM_HC, 1, fit_the_mod) %>% 
+                    t() %>% 
+                    as.data.frame() %>%  
+                    rownames_to_column("Gene") %>% 
+                    mutate(FDR_LM = p.adjust(Pval_LM,method="BH")) %>%  
+      dplyr::rename(EffSize_HC = EffSize_LM, Pval_HC = Pval_LM, FDR_HC = FDR_LM) %>% 
+      mutate(EffSize_HC = -1 * EffSize_HC) # Switch sign
+
+# Now we are going to apply the same method to HvsR
+# Now create the new model including the surrogates variables. 
+model <-  as.formula(paste('GeneExpr ~',paste(c(colnames(demoHR_sv)), collapse= "+")))
+
+tmpDemo <- demoHR_sv
+
+hr_stat_sva <- apply(logCPM_HR, 1, fit_the_mod) %>% 
+                    t() %>% 
+                    as.data.frame() %>% 
+                    rownames_to_column("Gene") %>% 
+                    mutate(FDR_LM = p.adjust(Pval_LM,method="BH")) %>%  
+        dplyr::rename(EffSize_HR = EffSize_LM, Pval_HR = Pval_LM, FDR_HR = FDR_LM) %>% 
+        mutate(EffSize_HR = -1 * EffSize_HR) # Switch sign
+
+# Now we are going to apply the same method to CvsR
+# Now create the new model including the surrogates variables. 
+model <-  as.formula(paste('GeneExpr ~',paste(c(colnames(demoCR_sv)), collapse= "+")))
+
+tmpDemo <- demoCR_sv
+
+cr_stat_sva <- apply(logCPM_CR, 1, fit_the_mod) %>% 
+                    t() %>% 
+                    as.data.frame() %>% 
+                    rownames_to_column("Gene") %>% 
+                    mutate(FDR_LM = p.adjust(Pval_LM,method="BH")) %>%  
+          dplyr::rename(EffSize_CR = EffSize_LM, Pval_CR = Pval_LM, FDR_CR = FDR_LM) %>% 
+          mutate(EffSize_CR = -1 * EffSize_CR) # Switch sign 
+
+# Combine the data
+HCR_stat_sva <- Reduce(dplyr::full_join, list(hc_stat_sva, hr_stat_sva, cr_stat_sva))
+
+openxlsx::write.xlsx(HCR_stat_sva, 
+                     file = "peb_data/output/HCR_stat_sva.xlsx", 
+                     colNames = TRUE, 
+                     borders = "columns", 
+                     sheetName="Full Table")
+
+save(hc_stat_sva, hr_stat_sva, cr_stat_sva, HCR_stat_sva, 
+     file = "peb_data/output/Linear_Modeling_Statistics_SVA.RData")
+
+save(svaobj, file = "peb_data/output/Surrogate_Variables.RData")
+
+# Now calculate species specific genes with SVs
+
+# Human first! 
+Hsap_Spec_sva <- HCR_stat_sva %>% 
+                    filter(FDR_HC < 0.05, FDR_HR < 0.05, FDR_CR > 0.1, 
+                    sign(EffSize_HC) == sign(EffSize_HR))
+            
+# Let's check how many genes survived
+dim(Hsap_Spec_sva)
+
+DT::datatable(Hsap_Spec_sva, options = list(pageLength = 10))
+
+
+# Now chimp specific
+PanTro_Spec_sva <- HCR_stat_sva %>% 
+                      filter(FDR_HC < 0.05, FDR_HR > 0.1, FDR_CR < 0.05, 
+                      sign(-1 * EffSize_HC) == sign(EffSize_CR))
+
+dim(PanTro_Spec_sva)
+
+DT::datatable(PanTro_Spec_sva, options = list(pageLength = 10))
+
+# Now macaque specific
+RheMac_Spec_sva <- HCR_stat_sva %>% 
+                      filter(FDR_HC > 0.1, FDR_HR < 0.05, FDR_CR < 0.05, 
+                      sign(-1 * EffSize_HR) == sign(-1 * EffSize_CR)) 
+
+dim(RheMac_Spec_sva)
+
+DT::datatable(RheMac_Spec_sva, options = list(pageLength = 10))
+
+# Save the data that we will explore later
+save(Hsap_Spec_sva, PanTro_Spec_sva, RheMac_Spec_sva, 
+     file = "peb_data/output/Species_Specific_DGE_SVA.RData")
+
+```
+
+## Balance the gene expression for covariates
+
+We calculated the DGE with/without SVs based on linear modeling. 
+However, the normalized data is not actually adjusted for any of these covariates. The covariates are taken into account in the modeling but the input data is not changed. 
+
+Why do we care about this? 
+
+Gene expression data should be balanced by these covariates because you have some variance that is explained by each covariate, minimal or large. 
+
+Applying residualization procedure, we will remove all the variance explained by covariates and eventually unwanted sources of variations. 
+
+This step is important for any visualizations or additional analysis (e.g. coexpression based on correlation) you want to apply: the data must be adjusted before. 
+
+```{r balancing expression}
+
+# For this part we will need the log2 scaled cpm filtered and the total demographic with the SVs.
+# We will regress out everything except SPECIES. 
+# You don't want to remove the variance explained by species right? :-)
+
+# Residualisation procedure
+avebeta.lm <- lapply(1:nrow(logCPM_filtered), function(x){
+                                  # Remove Species!
+                                  lm(unlist(logCPM_filtered[x,])~.,data=metadata_sv[c(-1)]) 
+                                })
+    # Get the residuals
+    residuals<-lapply(avebeta.lm, function(x) residuals(summary(x))) 
+    residuals<-do.call(rbind, residuals)
+
+logCPM_adjusted <- residuals + 
+                    matrix(apply(logCPM_filtered, 1, mean), 
+                           nrow=nrow(residuals), 
+                           ncol=ncol(residuals))
+
+rownames(logCPM_adjusted)<-rownames(logCPM_filtered)
+
+# Save the data
+save(logCPM_adjusted, file = "peb_data/output/logCPM_adjusted.RData")
+
+```
+
+## DGE visualizations
+
+Now we calculated the species-specific DGE (with/without SVs).
+Now it's time to check the genes we idenfied. 
+We will work on the SV adjusted data
+
+```{r visualizations}
+
+# Let's make some diagnostic plots! 
+# Let's have a look to the p-value distribution of H vs C
+gghistogram(HCR_stat_sva, 
+            x = "Pval_HC",
+            color = "blue"
+            )
+
+# Let's have a look to the p-value distribution of H vs R
+gghistogram(HCR_stat_sva, 
+            x = "Pval_HR",
+            color = "red"
+            )
+
+# Let's have a look to the p-value distribution of C vs R
+gghistogram(HCR_stat_sva, 
+            x = "Pval_CR",
+            color = "green"
+            )
+
+# Now let's have a look to the concordance between effect sizes of Hspc Genes
+ggscatter(Hsap_Spec_sva, 
+          x = "EffSize_HC", 
+          y = "EffSize_HR",
+          add = "reg.line",                       
+          conf.int = TRUE, 
+          add.params = list(color = "blue",
+                            fill = "lightgray")
+          ) +
+  stat_cor(method = "pearson")
+
+# Boxplot for a gene
+tmp <- data.frame(Species = demo$Species, GeneExp = as.numeric(logCPM_filtered["MET",]))
+
+comp <- list( c("Hsap", "PanTro"), 
+              c("Hsap", "RheMac"), 
+              c("PanTro", "RheMac"))
+
+ggboxplot(tmp, 
+          x = "Species", 
+          y = "GeneExp",
+          color = "Species", 
+          palette = c("red","green","blue"))+ 
+  stat_compare_means(comparisons = comp, method = "t.test") +
+  stat_compare_means(method = "anova")  
+
+# let's make a heatmap of the human specifc genes! 
+# We will use the expression balanced by covariates and the SVs
+# Let's make a matrix for the data
+genes <- Hsap_Spec_sva$Gene
+mat <- logCPM_adjusted[rownames(logCPM_adjusted) %in% genes,]
+
+# Let's make a heatmap! 
+pheatmap(mat,
+			cluster_cols=F,
+			scale="row",
+			color = colorRampPalette(c("navy", "white", "firebrick3"))(50),
+			annotation=metadata_sv, # add the annotation
+			show_rownames = F,
+			show_colnames=F,
+			cutree_cols = 3,
+			clustering_method = "ward.D2"
+			)
+
+# Now let's make a vulcano plot with the top genes annotated
+# First let's create a temporary file with some coloring information
+tmp <- HCR_stat_sva %>%
+    	mutate(LOG = -log10(FDR_HC),
+  Threshold = case_when(Gene %in% Hsap_Spec_sva$Gene ~ "DGE", !(Gene %in% Hsap_Spec_sva$Gene) ~ "NotDGE"),
+  Direction = case_when(EffSize_HC > 0 ~ "UP",EffSize_HC < 0 ~ "DOWN"))
+
+# First let's create a temporary file with the top genes you wanna visualize
+top_labelled <- tbl_df(tmp) %>% 
+					filter(Threshold == "DGE") %>%
+					group_by(Direction) %>% 
+					top_n(n = 15, wt = abs(EffSize_HC)) # Top by fold change
+
+ggscatter(tmp, 
+      x = "EffSize_HC", 
+      y = "LOG", 
+      color = "Threshold",
+      shape = "Direction",
+      size=2,
+      alpha=0.5,
+      palette = c("cyan4", "grey60"))+ 
+    geom_hline(yintercept = 1.3, colour = "red",linetype="dotted",size=1,alpha=0.5) +
+    geom_vline(xintercept = 0, colour = "black",linetype="dotted",size=1,alpha=0.5) + 
+    geom_text_repel(data = top_labelled, 
+                          mapping = aes(label = Gene), 
+                          size = 3,
+                          box.padding = unit(0.4, "lines"),
+                          point.padding = unit(0.4, "lines")) +
+    theme(legend.position="none")+
+    xlab("log2(FC)")+ 
+    ylab("-log10(FDR)")
+
+```
+
+## Functional Enrichment
+
+DGE analysis provides genes that are found differentially expressed between two or more groups of samples. 
+
+How can we interpret so many genes? 
+
+Functional enrichment might help with that! 
+Instead of going through each individual gene to have some clues about what kind of biological function the gene has, we can apply 
+enrichment analyses of functional terms that appear associated to the given set of differentially expressed genes more often than expected by chance. The functional terms usually are associated to multiple genes (e.g. synaptic transmission). 
+So genes can be clustered together and gene ontology analysis helps to quickly find out systematic changes that can describe differences between groups of samples.
+
+We can use R for that using some libraries such as **gProfileR** or **GOStats** or **clusterProfiler** or going online with tools such as **ToppGene** (https://toppgene.cchmc.org/).
+
+Today we are going to use quickly clusterProfiler.
+
+Let's staaaart! 
+
+```{r onto}
+
+# We are going to analyze the human specific genes! 
+head(Hsap_Spec_sva)
+
+# Create a table with Gene Symbol translated
+GenesOfInterest <- bitr(as.character(Hsap_Spec_sva$Gene),  
+                        fromType = "SYMBOL", 
+                  			toType = c("ENSEMBL", "ENTREZID"), 
+                  			OrgDb = org.Hs.eg.db)
+
+# Time for enrichment!
+# You can try biological processes (BP), cellular compontent (CC), and/or molecular function (MF)
+Hsap_GO <- enrichGO(gene = unique(GenesOfInterest$ENTREZID), 
+                keyType = "ENTREZID", 
+                OrgDb = org.Hs.eg.db, 
+                ont = "BP", 
+                pAdjustMethod = "none", 
+                pvalueCutoff  = 0.05, 
+                qvalueCutoff = 1, 
+        	readable = TRUE)
+
+DT::datatable(as.data.frame(Hsap_GO), options = list(pageLength = 10))
+
+
+# Kegg Pathways!
+Hsap_KEGG <- enrichKEGG(gene = unique(GenesOfInterest$ENTREZID), 
+                 		organism     = 'hsa', 
+                 		pAdjustMethod = "none", 
+                		pvalueCutoff  = 0.05, 
+                		qvalueCutoff = 1)
+
+DT::datatable(as.data.frame(Hsap_KEGG), options = list(pageLength = 10))
+
+```
+
+## DGE based on DESeq2
+
+Now we are going to touch base with **DESeq2** (https://bioconductor.org/packages/release/bioc/html/DESeq2.html). This method apply a different normalization called Variance Stabilizing Transformation (VST). This method is based on the Negative Binomial distributed counts. It is a variant of the Arc-hyperbolic-sine transformation (asinh). 
+Therefore, the input for DESeq2 is the count matrix and the modeling design. 
+
+Let's start then! 
+
+```{r deseq2 dge}
+
+# We will perform the DESeq analysisn on H vs C with SVA
+# We will need the demoHC, the logCPM_HC, and the row counts. 
+
+# First we need to filter the expressed genes for H and C from the raw counts! 
+# This are the genes considered expressed! 
+genes <- rownames(logCPM_filtered) 
+
+# Subset the counts
+counts_HC <- exp[rownames(exp) %in% genes, grep("Hsap|PanTro",colnames(exp))] 
+
+# Now let's run DESeq2
+ddsHC <- DESeqDataSetFromMatrix(countData = counts_HC, 
+                                colData = demoHC, 
+                                design = as.formula(paste('~',paste(c(colnames(demoHC)), collapse= "+"))))
+
+ddsHC <- estimateSizeFactors(ddsHC) # Estimate Size factors for VST
+ddsHC <- DESeq(ddsHC, full=design(ddsHC),parallel=TRUE) # Run DESeq2
+deseq_HC <- as.data.frame(results(ddsHC,contrast=c("Species","Hsap","PanTro"),cooksCutoff=FALSE))
+
+# Have a look to the info!
+DT::datatable(deseq_HC, options = list(pageLength = 10))
+
+# Here for Human vs Macque
+counts_HR <- exp[rownames(exp) %in% genes, grep("Hsap|RheMac",colnames(exp))] 
+
+ddsHR <- DESeqDataSetFromMatrix(countData = counts_HR, 
+                                colData = demoHR, 
+                                design = as.formula(paste('~',paste(c(colnames(demoHR)), collapse= "+"))))
+
+ddsHR <- estimateSizeFactors(ddsHR) # Estimate Size factors for VST
+ddsHR <- DESeq(ddsHR, full=design(ddsHR),parallel=TRUE) # Run DESeq2
+deseq_HR <- as.data.frame(results(ddsHR,contrast=c("Species","Hsap","RheMac"),cooksCutoff=FALSE))
+
+DT::datatable(deseq_HR, options = list(pageLength = 10))
+
+# And Chimp vs Macaque
+counts_CR <- exp[rownames(exp) %in% genes, grep("PanTro|RheMac",colnames(exp))] 
+
+ddsCR <- DESeqDataSetFromMatrix(countData = counts_CR, 
+                                colData = demoCR, 
+                                design = as.formula(paste('~',paste(c(colnames(demoCR)), collapse= "+"))))
+
+ddsCR <- estimateSizeFactors(ddsCR) # Estimate Size factors for VST
+ddsCR <- DESeq(ddsCR, full=design(ddsCR),parallel=TRUE) # Run DESeq2
+deseq_CR <- as.data.frame(results(ddsCR,contrast=c("Species","PanTro","RheMac"),cooksCutoff=FALSE))
+
+DT::datatable(deseq_CR, options = list(pageLength = 10))
+
+```
+
+## Exercise for Differential Expression Chapter
+
+- Calculate DGE with DESeq with SVs
+
+- Define Species-Specific DGE based on DESeq2 analysis
+
+- Visualize Species-Specific DGE based on DESeq2
+
+- Diagnostic analysis and functional interpretation of DESeq2 results

@@ -1,0 +1,346 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+# Data Exploration {#DataExploration}
+
+The starting data consist in RNA-seq count matrix after quantification (exp), a demographic table (demo) and a gene length table (width). The count table is a integer matrix without any normalizations. Each rows correspond to a gene, each column represent a different sample from three species (human, chimpanzee and rhesus macaque). The genes are protein-coding and orthologous between the three species. 
+
+### Data loading
+
+**So let's start!** 
+
+```{r loadData}
+# First load the libraries we will use in this section
+suppressPackageStartupMessages(library(sva))
+suppressPackageStartupMessages(library(DESeq2))
+suppressPackageStartupMessages(library(limma))
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(openxlsx))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(ggpubr))
+suppressPackageStartupMessages(library(pheatmap))
+suppressPackageStartupMessages(library(here))
+suppressPackageStartupMessages(library(future.apply))
+suppressPackageStartupMessages(library(broom))
+
+# Clean the env
+rm(list=ls())
+
+# the data is stored under the subdirectory "data"
+list.files()
+
+# load the data you need
+load(here("peb_data","PEB_2020.RData"))
+
+# Check what data you loaded
+ls()
+```
+
+The **exp** is the data frame containing raw counts. 
+
+The **demo** is the demographic data with some biological and technical covariates
+
+The **width** is the length of the the genes for data normalizations. 
+
+```{r checkData}
+# Check the dimension of exp
+dim(exp)
+
+# Let's have a look to the data distribution of the expression
+summary(exp)
+
+boxplot(exp)
+```
+
+### Demographic screening
+
+Demographics are important to understand what type of data you are dealing with. 
+There are several factors that can influence expression: some are categorical variables (e.g. Sex, Hemisphere), others are continous variables (e.g. Age). 
+These typically are important covariates to take into account into the analysis. 
+In principle, RNA-seq is a snapshot of the gene expression in a specific moment of time from a specific tissue (bulk RNA-seq) or cell-type (single cell RNA-seq). 
+
+Different factors can play a role in explaining partially the variance of the gene expression you see. 
+
+For instance, gender can slightly differentiate gene expression therefore we presume it will have a minimal impact on gene expression variance. On the other hand variables like PMI (Post-mortem interval), RIN (rna integrity number), Brain Bank (the institute where you collect the data), Batch (sequencing days and hands), and Age (the age of the individual who donated the tissue) might have a sever impact on the gene expression variance. 
+
+These variables must be taken into account when RNA-seq (but also other genomics) is analyzed. 
+
+Now let's see what we have in the demographic
+
+```{r strDemo}
+head(demo)
+
+str(demo)
+```
+
+### Data normalization
+
+Do you see something weird in the boxplot? 
+
+Pretty sure you realized that the distribution is skewed toward the bottom.
+
+There are several factors that can influence this: 
+
+  - Library size: sequencing depth. 
+  
+  - Gene lenght: long gens = more reads 
+  
+  - Library composition: some biological factors can influence the transcriptome between samples. 
+  
+  - GC content: GC can influence mappability, therefore gene count. 
+
+Several methods have been developped to normalize the values prior downstream analysis. 
+Here some examples: 
+
+- **CPM** (*Counts per million*): no length considered
+
+- **RPKM** (*Reads per kilobase per million*): length considered
+
+- **TPM** (*Transcript per million*): length considered
+
+- **CQN** (*Conditional quantile normalization*): length and GC content considered
+
+#### Calculate CPM
+
+```{r cpm}
+# Let's calculate the CPM
+plan(multiprocess)
+
+# future.apply is an alternative of the standard apply that goes in parallel. 
+# here we apply a function to the expression matrix dividing each column by the total reads * one million. 
+cpm <- future_apply(exp, 2, function(x) x/sum(as.numeric(x)) * 10^6)
+
+# Let's have a look!
+head(cpm)
+
+# The sum of each column is = 10^6.
+colSums(cpm)
+```
+
+#### Calculate RPKM
+
+```{r rpkm}
+# For RPKM you need the length of the genes (width)
+head(width)
+
+# let's create a vector with the gene length
+l <- as.vector(width$Length)
+
+# Calculate the RPKM
+rpkm <- future_apply(exp, 2, function(x) 10^9 * x / l / sum(as.numeric(x)))
+
+# Let's have a look!
+head(rpkm)
+
+# Now the sum are all different!.
+colSums(rpkm)
+```
+
+#### Calculate TPM
+
+```{r tpm}
+# For TPM you need the length of the genes (l)
+
+# First step: Calculate the reads per kilobase
+rpk <- future_apply(exp, 2, function(x) x/(l/1000))
+
+# Now the TPM
+tpm <- future_apply(rpk, 2, function(x) x / sum(as.numeric(x)) * 10^6)
+
+# Let's have a look!
+head(tpm)
+
+# The sum of each column is = 10^6!.
+colSums(tpm)
+```
+
+#### Calculate CQN
+
+```{r cqn}
+suppressPackageStartupMessages(library(cqn))
+
+# let's create a vector with the gene length and gc content
+length <- as.vector(width$Length)
+gc_content <- as.vector(width$GCperc)
+
+# Calculate CQN and normalized values
+temp <- cqn(exp, 
+            lengths = length, 
+            x = gc_content, 
+            sizeFactors = colSums(exp),
+            lengthMethod = "fixed",
+            sqn = FALSE)
+
+# get log2(normalized RPKM) values
+quantGC <- 2^(temp$y + temp$offset) 
+
+# Let's have a look!
+head(quantGC)
+
+# The sum of each column is = 10^6!.
+colSums(quantGC)
+```
+
+#### Check the normalized data
+
+Now we can have a look to the distribution of the normalized data
+
+```{r normDistrib}
+# Let's color based on the species
+colors <- as.numeric(factor(demo$Species)) + 1
+
+# Check the boxplot for CPM
+
+boxplot(cpm)
+
+# Still skewed? Let's make every normally distributed
+# the +1 is a offset reads to keep the 0 as 0!
+boxplot(log2(cpm + 1),notch=TRUE, main="log2(CPM+1)",col=colors) 
+abline(h=median(log2(cpm + 1)), col="blue")
+
+boxplot(log2(rpkm + 1),notch=TRUE, main="log2(RPKM+1)", col=colors) 
+abline(h=median(log2(rpkm + 1)), col="blue")
+
+boxplot(log2(tpm + 1),notch=TRUE, main="log2(TPM+1)", col=colors) 
+abline(h=median(log2(tpm + 1)), col="blue")
+
+boxplot(log2(quantGC + 1),notch=TRUE, main="log2(quantGC+1)", col=colors) 
+abline(h=median(log2(quantGC + 1)), col="blue")
+
+```
+
+### Initial Data Exploration
+
+Now the counts are normalized and we know what we are dealing with, we can start to understand how the samples are similar/dissimilar based on the quantified gene expression profiles of the genes. 
+We would expect that biological/technical replicates will cluster together. 
+This can be computed with different unsupervised clustering methods (e.g. hierarchical clustering) or with dimensionality reductions methods (e.g. Principal Component Analysis)
+
+Let's start:
+
+```{r pcas}
+# First let's make a matric with log2 scaled data. 
+mat <- log2(cpm + 1) 
+
+# Calculate the variance for each gene
+# This will detect the most variables genes
+variance <- apply(mat, 1, var) 
+
+# Let's sort them and select the top 100 genes.  
+selgene <- names(variance[order(variance, decreasing = T)][1:100])
+
+# Let's now calculate the Principal Components for the top 100 genes
+pca_cpm <- prcomp(t(mat[selgene,]))
+
+# Print the summary of the pcas
+summary(pca_cpm)
+
+# Let's have a look which PCA explain more variance
+screeplot(pca_cpm,npcs = 15, type = "barplot")
+
+# Now let's create a data frame with the PCAs and the values for coloring
+PCi<-data.frame(pca_cpm$x, Species=demo$Species)
+
+# Let's calcualte the variance explained by the each components
+eig <- (pca_cpm$sdev)^2
+variance <- eig*100/sum(eig)
+
+# Now plot the PCA
+ggscatter(PCi, 
+          x = "PC1", 
+          y = "PC2",
+          color = "Species",
+          palette=c("red","grey60","green"), 
+          shape = 21, size = 3,
+          ellipse = TRUE, 
+          mean.point = TRUE,
+          star.plot = TRUE)+
+          xlab(paste("PC1 (",round(variance[1],1),"% )"))+ 
+          ylab(paste("PC2 (",round(variance[2],1),"% )"))+
+          theme_classic()
+
+# Now let's make a dendrogram based on hirachical clustering
+hc <- hclust(dist(t(mat[selgene,])), "ave")
+plot(hc, hang = -1)
+
+# Another way with correlation
+correlation_mat <- cor(mat[selgene,],method="pearson")
+pheatmap(correlation_mat, annotation_col = demo, scale = 'row')
+
+```
+
+### Variance explained by covariates
+
+Now the big question: how much of the gene expression is explained by the biological/technical covaraites? 
+The covaraites can introduces systematic shifts in the downstream analysis and a good quality check is indeed to evaluate the variance that is explained by each of these covariates. 
+
+```{r covaraites}
+# Re-check the demographic data
+head(demo)
+
+# Now let's calcualte the PCA for all the data (not just the top variant genes)
+pca_all <- prcomp(t(log2(cpm + 1)))
+
+# Let's make a temporary demographic without the species
+tmp_demo <- demo[c(-1)]
+
+# Let's include the first PC into the demo file. 
+#This is the one that explain most of the variance in the data.
+tmp_demo$pca1<-pca_all$x[,1]
+
+# Make a model matrix for the model
+mm <- as.data.frame(model.matrix(~., tmp_demo))
+
+# Now we are going to fit a moodel between the first component and the other covaraites
+fit1=lm(pca1 ~ .,data=mm)
+
+# Let's transform the fit into a dataframe with library(broom) 
+df <- tidy(fit1)[-1,]
+
+# Let's check the info reported
+head(df)
+
+# The Pvalue reflect how much the covariates are associated with the first component.
+# Transform the p-value into a log10 scale.
+df$log10=-log10(df$p.value) 
+
+# Let's visualize the association based on this modeling
+ggbarplot(df, 
+          x = "term", 
+          y = "log10", 
+          fill = "white",            
+          color = "blue",            
+          x.text.angle = 90,           
+          ylab = "-log10(P)", 
+          xlab = "Covariates", 
+          rotate = TRUE, 
+          ggtheme = theme_classic()) +  
+          geom_hline(yintercept = 1.3, 
+                      linetype="dotted", 
+                     color = "red", size=1) + 
+          ylim(0,5) + 
+      ggtitle("PCA1 vs Covariates")
+
+```
+
+### Save the data
+
+Now it's time to save all the data we generated. 
+
+```{r saving}
+
+save(exp, cpm, rpkm, tpm, quantGC, demo, file="peb_data/Normalized_data.RData")
+
+```
+
+### Exercise for Data Exploration chapter
+
+  - Do data exploration for RPKM. 
+  
+  - Do data exploration for TPM 
+  
+  - Do data exploration for quantGC. 
+
+  - Covaraite association with different normalized values. 

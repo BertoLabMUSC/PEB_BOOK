@@ -1,0 +1,123 @@
+--- 
+title: "Comparative genomics using R"
+author: "Stefano Berto, PhD"
+date: "`r Sys.Date()`"
+knit: "bookdown::render_book"
+documentclass: book
+bibliography: [book.bib]
+biblio-style: apalike
+link-citations: yes
+colorlinks: yes
+site: bookdown::bookdown_site
+description: "Comparative genomics using R"
+url: 'https://github.com/StefanoBertoUTSW/PEB_BOOK'
+cover-image: images/cover.jpg
+always_allow_html: yes
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+
+options(
+  htmltools.dir.version = FALSE, 
+  formatR.indent = 2,
+  width = 60, 
+  digits = 4, 
+  warnPartialMatchAttr = FALSE, 
+  warnPartialMatchDollar = FALSE
+)
+knitr::opts_chunk$set(echo = TRUE,
+                      fig.align = "center", 
+                      cache=TRUE,
+                      cache.rebuild = TRUE, 
+                      warning=FALSE, 
+                      message=FALSE,
+                      tidy.opts=list(width.cutoff=60),
+                      tidy=TRUE,
+                      collapse = TRUE)
+
+local({
+  r = getOption('repos')
+  if (!length(r) || identical(unname(r['CRAN']), '@CRAN@'))
+    r['CRAN'] = 'https://cran.rstudio.com' 
+  options(repos = r)
+})
+lapply(c('citr', 'formatR', 'svglite'), function(pkg) {
+  if (system.file(package = pkg) == '') install.packages(pkg)
+})
+```
+
+# Introduction {-}
+
+```{r out.width = "300px", fig.align='center', echo=FALSE, include=knitr::is_html_output(), fig.link=''}
+knitr::include_graphics('images/cover.jpg', dpi = NA)
+```
+
+The aim of this course is to provide the fundamentals for data analysis for comparative genomics. This course is a  starting point for computational genomics students interested on comparative genomics and a guide for further data analysis in more specific topics in genomics. 
+
+## What will you get out of this?  {-}
+This resource describes the skills and provides how-tos that will help readers 
+analyze their own comparative genomic data.
+
+Working together:
+
+- You will get exposed to current tools for transcriptomics.
+
+- You will advance with the basics of R and dive right in to specialized uses of R for comparative genomics.
+
+- You will apply simple data processing and analysis approached on the data
+
+- You will be able to use R and the library-verse to do some visualizations and in deep analysis.
+
+- You will (hopefully :-)) develop a critical mindset on data analysis, gaps, weakness and how to solve some problems. 
+
+- You will develop ideas, questions, hypothesis to how solve the big puzzle called brain
+
+## Structure of the course {-}
+The course is designed with insights into practical data analysis for comparative genomics. The course will focus on methods, data visualizations, and some biostats that can be applied not only to comparative data but also to more diverse data. The course will always show the code and explain the code for a particular data analysis task. 
+In addition, the course will provide also links and additional information such as websites, papers, websites for readers who desire to gain a bit more knowledge on the comparative genomics.
+
+Here the chapters with some exercises:
+
+- **"Introduction to RNA-seq pipes" chapter**
+
+Basic concepts of high-throughput sequencing pipelines, tools, and how to apply these to comparative genomics. This will go through just from step A (fastq.gz) to step Z (count table). Importantly, how-tos for quality checks, processing, alignments of high-throughput sequencing. 
+
+- **"Data Exploration" chapter**
+
+It provides basic R skills to explore, analyze, visualize data. The skills introduced in this chapter are important because cna be applied, with some modifications, to other type of data. 
+
+- **"Differential Expression" chapter**
+
+It provides basic R skills to explore, analyze, visualize differential expression between species.
+
+## Packages needed to run the course code {-}
+This course is primarily about using R packages. Therefore if you want to reproduce the analysis in this course you need to install the relevant packages in each chapter using `install.packages` or `BiocManager::install` functions. 
+
+So here we go!!
+
+```{r,installAllPackages,eval=FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install(c('qvalue','clusterProfiler','DESeq2',
+					   'limma','sva','edgeR','doParallel',
+					   'EnsDb.Hsapiens.v86','AnnotationDbi',
+					   'GOstats')
+                     
+install.packages("future.apply")
+install.packages("biomaRt")
+install.packages("tidymodels")
+install.packages("broom")
+install.packages("here")
+install.packages("pheatmap")
+install.packages("VennDiagram")
+install.packages("GGally")
+
+install.packages("devtools")
+devtools::install_github("kassambara/ggpubr")
+devtools::install_github("tidyverse/tidyverse")
+devtools::install_github("ycphs/openxlsx")
+devtools::install_github("tidyverse/ggplot2")
+devtools::install_github("hms-dbmi/UpSetR")
+
+```
